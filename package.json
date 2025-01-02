@@ -1,0 +1,64 @@
+{
+	"name": "@textbook/starter-kit",
+	"version": "2.0.0",
+	"description": "v2 upgrade of the starter kit",
+	"funding": "https://ko-fi.com/textbook",
+	"license": "ISC",
+	"author": "Jonathan Sharpe <mail@jonrshar.pe>",
+	"type": "module",
+	"workspaces": [
+		"web",
+		"api",
+		"e2e"
+	],
+	"scripts": {
+		"build": "npm --workspace web run build",
+		"dev": "cross-env API_PORT=3100 concurrently \"npm:dev:*\"",
+		"dev:api": "cross-env PORT=$API_PORT npm --workspace api run dev",
+		"dev:web": "cross-env PORT=3000 npm --workspace web run dev",
+		"e2e": "npm --workspace e2e run e2e",
+		"e2e:dev": "concurrently --kill-others --success first \"npm:e2e:dev:*\"",
+		"e2e:dev:app": "npm run dev",
+		"e2e:dev:e2e": "cross-env PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run e2e",
+		"lint": "npm run lint:eslint . && npm run lint:prettier -- --check .",
+		"lint:eslint": "cross-env ESLINT_USE_FLAT_CONFIG=true eslint --max-warnings 0",
+		"lint:fix": "npm run lint:eslint -- --fix . && npm run lint:prettier -- --write .",
+		"lint:prettier": "prettier --ignore-unknown",
+		"migration": "npm --workspace api run migration",
+		"prepare": "husky || echo 'no husky 🐶'",
+		"preserve": "npm run build",
+		"serve": "npm start",
+		"ship": "npm run lint && npm run test && npm run e2e",
+		"prestart": "npm run migration up",
+		"start": "npm --workspace api start",
+		"test": "npm --workspaces --if-present test",
+		"test:cover": "npm test -- -- --coverage",
+		"posttest:cover": "nyc report --report-dir reports/coverage --reporter lcov"
+	},
+	"lint-staged": {
+		"*.{js,jsx}": "npm run lint:eslint -- --fix",
+		"*": "npm run lint:prettier -- --write"
+	},
+	"prettier": {
+		"useTabs": true
+	},
+	"devDependencies": {
+		"@codeyourfuture/eslint-config-standard": "^5.1.0",
+		"@types/eslint": "^8.56.12",
+		"@types/node": "^20.16.10",
+		"concurrently": "^9.0.1",
+		"cross-env": "^7.0.3",
+		"eslint": "^8.57.1",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-import": "^2.30.0",
+		"globals": "^15.9.0",
+		"husky": "^9.1.6",
+		"lint-staged": "^15.2.10",
+		"nyc": "^17.1.0",
+		"prettier": "^3.3.3"
+	},
+	"engines": {
+		"node": "^20.9 || ^22",
+		"npm": "^10"
+	}
+}

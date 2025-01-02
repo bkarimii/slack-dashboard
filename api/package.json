@@ -1,0 +1,30 @@
+{
+	"name": "api",
+	"private": true,
+	"description": "Express backend",
+	"license": "UNLICENSED",
+	"author": "Jonathan Sharpe <mail@jonrshar.pe>",
+	"type": "module",
+	"scripts": {
+		"dev": "cross-env LOG_LEVEL=debug node --inspect --watch --watch-path . server.js",
+		"migration": "node-pg-migrate --config-file ./migrations/config.cjs",
+		"test": "cross-env DATABASE_URL=http://example.com NODE_OPTIONS='--experimental-vm-modules' jest",
+		"test:watch": "npm run test -- --watch"
+	},
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"express": "^4.21.0",
+		"helmet": "^7.2.0",
+		"morgan": "^1.10.0",
+		"node-pg-migrate": "^7.7.0",
+		"pg": "^8.13.0",
+		"winston": "^3.14.2"
+	},
+	"devDependencies": {
+		"@testcontainers/postgresql": "^10.13.1",
+		"eslint-plugin-jest": "^28.8.3",
+		"eslint-plugin-n": "^17.10.3",
+		"jest": "^29.7.0",
+		"supertest": "^7.0.0"
+	}
+}
