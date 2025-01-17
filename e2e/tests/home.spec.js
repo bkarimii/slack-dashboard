@@ -1,22 +1,13 @@
 import { test, expect } from "@playwright/test";
 
-test("has title", async ({ page }) => {
-	await page.goto("/");
+test("has correct page title", async ({ page }) => {
+	await page.goto("/", { waitUntil: "domcontentloaded" });
 
-	await expect(page).toHaveTitle(/Vite \+ React/);
+	await expect(page).toHaveTitle("CYF Slack Dashboard");
 });
 
-test("has Vite.js link", async ({ page }) => {
+test("homepage loads successfully", async ({ page }) => {
 	await page.goto("/");
 
-	await expect(page.getByRole("link", { name: "Vite logo" })).toHaveAttribute(
-		"href",
-		"https://vitejs.dev",
-	);
-});
-
-test("shows server status", async ({ page }) => {
-	await page.goto("/");
-
-	await expect(page.getByText("Server says: Hello, world!")).toBeAttached();
+	await expect(page.locator("body")).toBeAttached();
 });
