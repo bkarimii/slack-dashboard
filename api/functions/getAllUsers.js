@@ -1,18 +1,19 @@
 export async function getAllUsers(web) {
-	const allUsersArray = [];
+	const allUsers = [];
 	try {
 		// Fetch the list of users
 		const response = await web.users.list();
 		if (response.ok) {
-			const allUsers = response.members;
+			const users = response.members;
 
-			allUsers.forEach((eachUser) => {
-				allUsersArray.push({
+			users.forEach((eachUser) => {
+				allUsers.push({
 					userId: eachUser.id,
 					title: eachUser.profile.title,
 					name: eachUser.name,
 					realName: eachUser.real_name,
 					realNameNormalised: eachUser.profile.real_name_normalized,
+					displayName: eachUser.display_name,
 					displayNameNormalised: eachUser.profile.display_name_normalized,
 					firstname: eachUser.profile.first_name,
 					lastname: eachUser.profile.last_name,
@@ -23,7 +24,7 @@ export async function getAllUsers(web) {
 				});
 			});
 
-			return allUsersArray;
+			return allUsers;
 		} else {
 			throw new Error(`Failed to fetch users: ${response.error}`);
 		}
