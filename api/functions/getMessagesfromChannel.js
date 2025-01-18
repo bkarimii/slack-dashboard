@@ -1,4 +1,4 @@
-// This function extracts all the messages from a specific channel
+import { callWithRetry } from "../utils/throttling.js";
 
 export async function getMessagesFromChannel(web, channelId) {
 	try {
@@ -8,10 +8,11 @@ export async function getMessagesFromChannel(web, channelId) {
 
 		// Fetch all messages, handling pagination
 		while (hasMore) {
-			const result = await web.conversations.history({
+			const result = await callWithRetry(web.conversations.history.bind(web), {
 				channel: channelId,
 				cursor: cursor, // This is for pagination
 			});
+
 			result.messages.filter((eachMessage) => {
 				if (!eachMessage.bot_id) {
 					allMessages.push({
@@ -32,12 +33,12 @@ export async function getMessagesFromChannel(web, channelId) {
 
 			// Check if there are more messages to fetch (pagination)
 			cursor = result.response_metadata.next_cursor;
-			hasMore = Boolean(cursor); // Continue if there is a next page
+			hasMore = Boolean(cursor);
 		}
 
 		return allMessages;
 	} catch (error) {
-		return [];
+		return { message: error };
 	}
 }
 
