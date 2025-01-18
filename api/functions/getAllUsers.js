@@ -1,8 +1,11 @@
+import { callWithRetry } from "../utils/throttling.js";
+
 export async function getAllUsers(web) {
 	const allUsers = [];
 	try {
-		// Fetch the list of users
-		const response = await web.users.list();
+		// Fetch the list of users with retry logic
+		const response = await callWithRetry(web.users.list.bind(web), {});
+
 		if (response.ok) {
 			const users = response.members;
 
@@ -29,6 +32,6 @@ export async function getAllUsers(web) {
 			throw new Error(`Failed to fetch users: ${response.error}`);
 		}
 	} catch (error) {
-		return [];
+		return { message: error };
 	}
 }
