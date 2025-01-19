@@ -29,7 +29,7 @@ export async function getAllUsers(web) {
 
 			return allUsers;
 		} else {
-			throw new Error(`Failed to fetch users: ${response.error}`);
+			throw new Error({ message: response.error });
 		}
 	} catch (error) {
 		return { message: error };
