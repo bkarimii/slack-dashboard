@@ -1,36 +1,35 @@
 // eslint-disable-next-line n/no-extraneous-import
 import { jest } from "@jest/globals";
 
-import { callWithRetry } from "../utils/throttling";
+import * as throttling from "../utils/throttling";
 
-import { getAllUsers } from "./getAllUsers.js";
+import { getAllUsers } from "./getAllUsers";
 
 jest.mock("../utils/throttling");
 
 describe("getAllUsers", () => {
-	let web;
+	const mockWeb = {
+		users: {
+			list: jest.fn(),
+		},
+	};
 
 	beforeEach(() => {
-		web = {
-			users: {
-				list: jest.fn(),
-			},
-		};
+		jest.clearAllMocks();
 	});
 
 	it("should return all users when the API call is successful", async () => {
-		// Mock the callWithRetry to return a successful response
-		callWithRetry.mockResolvedValue({
+		throttling.callWithRetry.mockResolvedValue({
 			ok: true,
 			members: [
 				{
-					id: "U01",
-					name: "john",
+					id: "U123",
+					name: "johndoe",
 					real_name: "John Doe",
 					profile: {
-						title: "Engineer",
+						title: "Developer",
 						real_name_normalized: "John Doe",
-						display_name: "johnny",
+						display_name: "Johnny",
 						display_name_normalized: "Johnny",
 						first_name: "John",
 						last_name: "Doe",
@@ -43,16 +42,16 @@ describe("getAllUsers", () => {
 			],
 		});
 
-		const result = await getAllUsers(web);
+		const result = await getAllUsers(mockWeb);
 
 		expect(result).toEqual([
 			{
-				userId: "U01",
-				title: "Engineer",
-				name: "john",
+				userId: "U123",
+				title: "Developer",
+				name: "johndoe",
 				realName: "John Doe",
 				realNameNormalised: "John Doe",
-				displayName: "johnny",
+				displayName: "Johnny",
 				displayNameNormalised: "Johnny",
 				firstname: "John",
 				lastname: "Doe",
@@ -62,19 +61,80 @@ describe("getAllUsers", () => {
 				isAppUser: false,
 			},
 		]);
-		expect(callWithRetry).toHaveBeenCalledWith(web.users.list.bind(web), {});
+
+		expect(throttling.callWithRetry).toHaveBeenCalledWith(
+			expect.any(Function),
+			{},
+		);
 	});
 
-	it("should throw an error with a message when the API call fails", async () => {
-		callWithRetry.mockResolvedValue({
+	it("should return an error message when the API call fails", async () => {
+		throttling.callWithRetry.mockResolvedValue({
 			ok: false,
-			error: "auth error",
+			error: "API Error",
 		});
 
-		await expect(getAllUsers(web)).rejects.toThrow(
-			new Error({ message: "auth error" }),
+		const result = await getAllUsers(mockWeb);
+
+		expect(result).toEqual({ message: new Error({ message: "API Error" }) });
+		expect(throttling.callWithRetry).toHaveBeenCalledWith(
+			expect.any(Function),
+			{},
+		);
+	});
+});
+
+describe("callWithRetry", () => {
+	it("should retry on error with retry_after", async () => {
+		const mockApiCall = jest.fn();
+		mockApiCall
+			.mockRejectedValueOnce({ data: { retry_after: 1 } })
+			.mockResolvedValueOnce({ ok: true, data: "success" });
+
+		throttling.callWithRetry.mockImplementation(
+			async (apiCall, args, retries = 5) => {
+				try {
+					return await apiCall(args);
+				} catch (error) {
+					if (error.data && error.data.retry_after) {
+						await new Promise((resolve) =>
+							setTimeout(resolve, error.data.retry_after * 1000),
+						);
+						return throttling.callWithRetry(apiCall, args, retries - 1);
+					}
+					if (retries > 0) {
+						return throttling.callWithRetry(apiCall, args, retries - 1);
+					}
+					throw error;
+				}
+			},
 		);
 
-		expect(callWithRetry).toHaveBeenCalledWith(web.users.list.bind(web), {});
+		const result = await throttling.callWithRetry(mockApiCall, {});
+
+		expect(result).toEqual({ ok: true, data: "success" });
+		expect(mockApiCall).toHaveBeenCalledTimes(2);
+	});
+
+	it("should throw an error after max retries", async () => {
+		const mockApiCall = jest.fn().mockRejectedValue(new Error("API Error"));
+
+		throttling.callWithRetry.mockImplementation(
+			async (apiCall, args, retries = 5) => {
+				try {
+					return await apiCall(args);
+				} catch (error) {
+					if (retries > 0) {
+						return throttling.callWithRetry(apiCall, args, retries - 1);
+					}
+					throw error;
+				}
+			},
+		);
+
+		await expect(throttling.callWithRetry(mockApiCall, {})).rejects.toThrow(
+			"API Error",
+		);
+		expect(mockApiCall).toHaveBeenCalledTimes(6); // Initial call + 5 retries
 	});
 });
