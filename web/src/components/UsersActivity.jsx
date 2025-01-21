@@ -4,6 +4,7 @@ export default function UsersActivity() {
 	const [inputBoxValue, setInputBoxvalue] = useState("");
 	const [userActivity, setUserActivity] = useState(null);
 	const [errorMessage, setErrorMessage] = useState("");
+	const [loading, setLoading] = useState(false);
 
 	const handleInputChange = (e) => {
 		setInputBoxvalue(e.target.value);
@@ -11,6 +12,9 @@ export default function UsersActivity() {
 	const url = "api/user-activity";
 
 	const fetchUsersInfo = async (userId) => {
+		setErrorMessage(null);
+		setLoading(true);
+
 		try {
 			const response = await fetch(url, {
 				method: "POST",
@@ -19,35 +23,52 @@ export default function UsersActivity() {
 				},
 				body: JSON.stringify({ userId }),
 			});
+
 			if (response.ok) {
 				const data = await response.json();
 				if (data.success) {
 					setUserActivity(data.user);
-					console.log(userActivity, "<-----user");
 				} else {
-					setErrorMessage("User not found!");
+					setErrorMessage("Unexpected response format!");
+					setUserActivity(null);
 				}
+			} else if (response.status === 404) {
+				setUserActivity(null);
+				setErrorMessage("User not found!");
+			} else {
+				setErrorMessage(`Unexpected error: ${response.status}`);
 			}
 		} catch (error) {
-			setErrorMessage("something went wrong!");
+			setErrorMessage("Something went wrong! Please try again later.");
+		} finally {
+			setLoading(false);
 		}
 	};
 
 	const handleSubmit = (e) => {
-		fetchUsersInfo(inputBoxValue);
 		e.preventDefault();
+		const trimmedValue = inputBoxValue.trim();
+		if (trimmedValue.length !== 0) {
+			fetchUsersInfo(trimmedValue);
+		} else {
+			setErrorMessage("Empty user IDs are not allowed!");
+			setUserActivity(null);
+		}
 	};
 
 	return (
 		<>
-			<form>
+			<form onSubmit={handleSubmit}>
 				<input
 					type="text"
 					value={inputBoxValue}
 					onChange={handleInputChange}
 					placeholder="Enter users ID"
+					disabled={loading}
 				/>
-				<button onClick={handleSubmit}>Submit</button>
+				<button type="submit" disabled={loading}>
+					{loading ? "Loading..." : "Submit"}
+				</button>
 			</form>
 			{userActivity && (
 				<div>
