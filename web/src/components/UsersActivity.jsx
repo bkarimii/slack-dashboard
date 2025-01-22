@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+import { FRONT_END_RESPONSE } from "./../../../constants/FRONT_END_RESPONSE.js";
+import "./UserActivity.css";
+
 export default function UsersActivity() {
 	const [inputBoxValue, setInputBoxvalue] = useState("");
 	const [userActivity, setUserActivity] = useState(null);
@@ -49,7 +52,13 @@ export default function UsersActivity() {
 		e.preventDefault();
 		const trimmedValue = inputBoxValue.trim();
 		if (trimmedValue.length !== 0) {
-			fetchUsersInfo(trimmedValue);
+			const offline = true;
+			if (offline) {
+				setUserActivity(FRONT_END_RESPONSE);
+				console.log(userActivity, "user activity ------");
+			} else {
+				fetchUsersInfo(trimmedValue);
+			}
 		} else {
 			setErrorMessage("Empty user IDs are not allowed!");
 			setUserActivity(null);
@@ -58,26 +67,51 @@ export default function UsersActivity() {
 
 	return (
 		<>
-			<form onSubmit={handleSubmit}>
+			<form className="user-form" onSubmit={handleSubmit}>
 				<input
+					className="user-input"
 					type="text"
 					value={inputBoxValue}
 					onChange={handleInputChange}
 					placeholder="Enter users ID"
 					disabled={loading}
 				/>
-				<button type="submit" disabled={loading}>
+				<button className="user-button" type="submit" disabled={loading}>
 					{loading ? "Loading..." : "Submit"}
 				</button>
 			</form>
 			{userActivity && (
-				<div>
-					<p>userId:{userActivity.userId}</p>
-					<p>Name: {userActivity.realName}</p>
+				<div className="user-activity-container">
+					<h3 className="user-activity-title">User Activity Details</h3>
+					<p>
+						<strong>User ID:</strong> {userActivity.data[0].userId}
+					</p>
+					<p>
+						<strong>Name:</strong> {userActivity.data[0].name}
+					</p>
+					<p>
+						<strong>Real Name:</strong> {userActivity.data[0].realName}
+					</p>
+					<p>
+						<strong>Number of Threads:</strong>{" "}
+						{userActivity.data[0].numOfThreads}
+					</p>
+					<p>
+						<strong>Number of Replies:</strong>{" "}
+						{userActivity.data[0].numOfReplies}
+					</p>
+					<p>
+						<strong>Number of Reactions:</strong>{" "}
+						{userActivity.data[0].numOfReactions}
+					</p>
+					<p>
+						<strong>Total Activity:</strong>{" "}
+						{userActivity.data[0].totalActivity}
+					</p>
 				</div>
 			)}
 			{errorMessage && (
-				<div>
+				<div className="error-message">
 					<p>{errorMessage}</p>
 				</div>
 			)}
