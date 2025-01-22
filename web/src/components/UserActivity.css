@@ -1,0 +1,84 @@
+/* Form Styles */
+.user-form {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-width: 400px;
+	margin: 20px auto;
+	padding: 20px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #f9f9f9;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Input Styles */
+.user-input {
+	padding: 10px;
+	font-size: 16px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	outline: none;
+	transition: border-color 0.3s;
+}
+
+.user-input:focus {
+	border-color: #007bff;
+}
+
+/* Button Styles */
+.user-button {
+	padding: 10px;
+	font-size: 16px;
+	color: #fff;
+	background-color: #007bff;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.user-button:disabled {
+	background-color: #cccccc;
+	cursor: not-allowed;
+}
+
+.user-button:hover:not(:disabled) {
+	background-color: #0056b3;
+}
+
+/* User Activity Container */
+.user-activity-container {
+	border: 1px solid #ccc;
+	padding: 20px;
+	border-radius: 5px;
+	background-color: #f9f9f9;
+	max-width: 400px;
+	margin: 20px auto;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Title Style */
+.user-activity-title {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 15px;
+	text-align: center;
+	color: #333;
+}
+
+/* Paragraph Styling */
+.user-activity-container p {
+	font-size: 16px;
+	line-height: 1.5;
+	color: #555;
+	margin-bottom: 10px;
+}
+
+/* Error Message Styles */
+.error-message {
+	color: red;
+	font-size: 16px;
+	text-align: center;
+	margin-top: 10px;
+}
