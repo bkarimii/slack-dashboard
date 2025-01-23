@@ -55,8 +55,10 @@ export default function UsersActivity() {
 			const offline = true;
 			if (offline) {
 				setUserActivity(FRONT_END_RESPONSE);
+				setInputBoxvalue("");
 			} else {
 				fetchUsersInfo(trimmedValue);
+				setInputBoxvalue("");
 			}
 		} else {
 			setErrorMessage("Empty user IDs are not allowed!");
