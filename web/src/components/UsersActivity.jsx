@@ -55,7 +55,6 @@ export default function UsersActivity() {
 			const offline = true;
 			if (offline) {
 				setUserActivity(FRONT_END_RESPONSE);
-				console.log(userActivity, "user activity ------");
 			} else {
 				fetchUsersInfo(trimmedValue);
 			}
