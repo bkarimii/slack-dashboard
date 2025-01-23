@@ -5,8 +5,8 @@ export const FRONT_END_RESPONSE = {
 		{
 			userId: "U04NG9G5SD7",
 			channelId: "C088P059D5G",
-			name: "behrouzkarimi1993",
-			realName: "Behrouz Karimi",
+			name: "JohnDoe",
+			realName: "John Doe",
 			isBot: false,
 			numOfThreads: 4,
 			numOfReplies: 2,
@@ -16,8 +16,8 @@ export const FRONT_END_RESPONSE = {
 		{
 			userId: "U04NG9G5SD7",
 			channelId: "C088P3YLJN6",
-			name: "behrouzkarimi1993",
-			realName: "Behrouz Karimi",
+			name: "JohnDoe",
+			realName: "John Doe",
 			isBot: false,
 			numOfThreads: 3,
 			numOfReplies: 0,
@@ -27,8 +27,8 @@ export const FRONT_END_RESPONSE = {
 		{
 			userId: "U04NG9G5SD7",
 			channelId: "C089CNEDG2D",
-			name: "behrouzkarimi1993",
-			realName: "Behrouz Karimi",
+			name: "JaneDoe",
+			realName: "Jane Doe",
 			isBot: false,
 			numOfThreads: 7,
 			numOfReplies: 0,
