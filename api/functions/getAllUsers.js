@@ -12,24 +12,28 @@ export async function getAllUsers(web) {
 			users.forEach((eachUser) => {
 				allUsers.push({
 					userId: eachUser.id,
-					title: eachUser.profile.title,
-					name: eachUser.name,
-					realName: eachUser.real_name,
-					realNameNormalised: eachUser.profile.real_name_normalized,
-					displayName: eachUser.display_name,
-					displayNameNormalised: eachUser.profile.display_name_normalized,
-					firstname: eachUser.profile.first_name,
-					lastname: eachUser.profile.last_name,
-					isAdmin: eachUser.is_admin,
-					isOwner: eachUser.is_owner,
-					isBot: eachUser.is_bot,
-					isAppUser: eachUser.is_app_user,
+					title: eachUser.profile.title ?? undefined,
+					name: eachUser.name ?? undefined,
+					realName: eachUser.real_name ?? undefined,
+					realNameNormalised:
+						eachUser.profile.real_name_normalized ?? undefined,
+					displayName: eachUser.display_name ?? undefined,
+					displayNameNormalised:
+						eachUser.profile.display_name_normalized ?? undefined,
+					firstname: eachUser.profile.first_name ?? undefined,
+					lastname: eachUser.profile.last_name ?? undefined,
+					isAdmin: eachUser.is_admin ?? undefined,
+					isOwner: eachUser.is_owner ?? undefined,
+					isBot: eachUser.is_bot ?? undefined,
+					isAppUser: eachUser.is_app_user ?? undefined,
+					image_72: eachUser.profile.image_72 ?? undefined,
+					image_192: eachUser.profile.image_192 ?? undefined,
 				});
 			});
 
 			return allUsers;
 		} else {
-			throw new Error({ message: response.error });
+			return { message: response.error };
 		}
 	} catch (error) {
 		return { message: error };
