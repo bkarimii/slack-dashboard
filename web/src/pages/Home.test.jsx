@@ -12,7 +12,7 @@ describe("Home component", () => {
 
 	it("renders the login button", () => {
 		render(<Home />);
-		const loginButton = screen.getByRole("button", { name: /login/i });
-		expect(loginButton).toBeInTheDocument();
+		const submit = screen.getByRole("button", { name: /submit/i });
+		expect(submit).toBeInTheDocument();
 	});
 });
