@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-export const FRONT_END_RESPONSE = {
+const FRONT_END_RESPONSE = {
 	success: true,
 	data: [
 		{
@@ -57,3 +57,5 @@ export const FRONT_END_RESPONSE = {
 		},
 	],
 };
+
+export default FRONT_END_RESPONSE;
