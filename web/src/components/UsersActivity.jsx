@@ -52,6 +52,7 @@ export default function UsersActivity() {
 		e.preventDefault();
 		const trimmedValue = inputBoxValue.trim();
 		if (trimmedValue.length !== 0) {
+			// You can set it false to fetch real data
 			const offline = true;
 			if (offline) {
 				setUserActivity(FRONT_END_RESPONSE);
