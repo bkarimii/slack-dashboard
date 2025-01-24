@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import FRONT_END_RESPONSE from "./FRONT_END_RESPONSE";
+import FRONT_END_RESPONSE from "../frontEndConstants/FRONT_END_RESPONSE";
 import "./UserActivity.css";
 
 export default function UsersActivity() {
