@@ -91,7 +91,7 @@ jobs:
             --init \
             --network 'host' \
             textbook/starter-kit:v2)" >> $GITHUB_OUTPUT
-      - run: npx --yes wait-on --log --timeout 30000 http-get://localhost:4321
+      - run: npx --yes wait-on --log --timeout 60000 http-get://localhost:4321
       - run: npm run e2e
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:4321
