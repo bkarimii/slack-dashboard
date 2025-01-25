@@ -1,5 +1,5 @@
 /* eslint-disable n/no-extraneous-require */
-/* eslint-disable no-restricted-syntax */
+
 const { join, resolve } = require("node:path");
 
 const { WebClient } = require("@slack/web-api");
