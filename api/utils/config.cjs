@@ -1,8 +1,5 @@
-/* eslint-disable no-restricted-syntax */
-
 const { join, resolve } = require("node:path");
 
-// eslint-disable-next-line n/no-extraneous-require
 const { WebClient } = require("@slack/web-api");
 const { configDotenv } = require("dotenv");
 
