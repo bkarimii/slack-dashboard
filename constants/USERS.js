@@ -1,3 +1,4 @@
+// a simple comment to check CIs pass
 /* eslint-disable no-unused-vars */
 export const USERS = [
 	{
