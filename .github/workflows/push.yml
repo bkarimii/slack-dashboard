@@ -44,7 +44,6 @@ jobs:
       - run: npm run test:cover
         env:
           FORCE_COLOR: true
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
       - run: npm run migration up
       - run: npm run e2e
       - run: npm run e2e:dev
