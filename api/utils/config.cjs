@@ -32,7 +32,6 @@ const sslMode = ["prefer", "require", "verify-ca", "verify-full"].includes(
  * @property {boolean} production
  */
 module.exports = {
-	slackToken,
 	dbConfig: {
 		connectionString: databaseUrl.toString(),
 		connectionTimeoutMillis: 5_000,
@@ -42,6 +41,7 @@ module.exports = {
 	logLevel: process.env.LOG_LEVEL?.toLowerCase() ?? "info",
 	port: parseInt(process.env.PORT ?? "3000", 10),
 	production: process.env.NODE_ENV?.toLowerCase() === "production",
+	slackToken,
 };
 
 function requireArgs(required) {
