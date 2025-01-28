@@ -56,3 +56,5 @@ function requireArgs(required) {
 		);
 	}
 }
+
+// Test comment
