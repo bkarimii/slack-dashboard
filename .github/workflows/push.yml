@@ -34,6 +34,7 @@ jobs:
           - 5432:5432
     env:
       DATABASE_URL: postgres://testdb:keepitsecret@localhost:5432/testdb
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
     steps:
       - uses: textbook/take-action@nodejs
         with:
