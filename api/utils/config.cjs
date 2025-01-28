@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const { join, resolve } = require("node:path");
 
+const { WebClient } = require("@slack/web-api");
 const { configDotenv } = require("dotenv");
 
 const dotenvPath = resolve(
@@ -9,9 +10,11 @@ const dotenvPath = resolve(
 
 configDotenv({ path: dotenvPath });
 
-requireArgs(["DATABASE_URL"]);
+requireArgs(["DATABASE_URL", "SLACK_TOKEN"]);
 
 const databaseUrl = new URL(process.env.DATABASE_URL);
+const slackToken = process.env.SLACK_TOKEN;
+const web = new WebClient(slackToken);
 
 const localDb = [
 	"0.0.0.0",
@@ -31,6 +34,7 @@ const sslMode = ["prefer", "require", "verify-ca", "verify-full"].includes(
  * @property {boolean} production
  */
 module.exports = {
+	web,
 	dbConfig: {
 		connectionString: databaseUrl.toString(),
 		connectionTimeoutMillis: 5_000,
