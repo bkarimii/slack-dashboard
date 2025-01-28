@@ -56,7 +56,6 @@ jobs:
         env:
           POSTGRES_PASSWORD: keepitsecret
           POSTGRES_USER: testdb
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
