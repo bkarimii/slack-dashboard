@@ -1,10 +1,10 @@
-import UsersActivity from "../components/UsersActivity";
+import { SubscribtionForm } from "../components/SubscribtionForm";
 
 function App() {
 	return (
 		<>
 			<h1>CYF Slack Dashboard</h1>
-			<UsersActivity />
+			<SubscribtionForm />
 		</>
 	);
 }
