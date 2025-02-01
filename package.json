@@ -2,7 +2,9 @@
 	"name": "@textbook/starter-kit",
 	"version": "2.0.0",
 	"description": "v2 upgrade of the starter kit",
-	"funding": "https://ko-fi.com/textbook",
+	"funding": {
+		"url": "https://ko-fi.com/textbook"
+	},
 	"license": "ISC",
 	"author": "Jonathan Sharpe <mail@jonrshar.pe>",
 	"type": "module",
@@ -55,7 +57,8 @@
 		"husky": "^9.1.6",
 		"lint-staged": "^15.2.10",
 		"nyc": "^17.1.0",
-		"prettier": "^3.3.3"
+		"prettier": "^3.3.3",
+		"rollup": "^4.34.0"
 	},
 	"engines": {
 		"node": "^20.9 || ^22",
@@ -64,5 +67,14 @@
 	"dependencies": {
 		"pg": "^8.13.1",
 		"postgres": "^3.4.5"
-	}
+	},
+	"main": "eslint.config.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bkarimii/slack-dashboard.git"
+	},
+	"bugs": {
+		"url": "https://github.com/bkarimii/slack-dashboard/issues"
+	},
+	"homepage": "https://github.com/bkarimii/slack-dashboard#readme"
 }
