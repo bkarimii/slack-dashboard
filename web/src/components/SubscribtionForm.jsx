@@ -4,25 +4,29 @@ function SubscribtionForm() {
 	const [subscribedUserEmail, setSubscribedUserEmail] = useState("");
 	const [successfulFetch, setSuccessfulFetch] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
-	const url = "api/subscribtion";
+	const url = "/api/user-subscribtion";
+
 	const fetchUsersSubscribtion = async () => {
 		try {
+			// Clear previous error messages
+			setErrorMessage("");
 			const postedEmail = await fetch(url, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(subscribedUserEmail),
+				body: JSON.stringify({ email: subscribedUserEmail }),
 			});
 			if (postedEmail.ok) {
 				setSuccessfulFetch(true);
 			} else {
 				const responseData = await postedEmail.json();
-				setErrorMessage(responseData);
+				setErrorMessage(responseData.message || "An error occurred");
 				setSuccessfulFetch(false);
 			}
 		} catch (error) {
 			setErrorMessage(error.message);
+			setSuccessfulFetch(false);
 		}
 	};
 
@@ -39,14 +43,15 @@ function SubscribtionForm() {
 					placeholder="Enter your Email address."
 					value={subscribedUserEmail}
 					onChange={(e) => setSubscribedUserEmail(e.target.value)}
-				></input>
+					required
+				/>
 				<button type="submit">Subscribe</button>
 			</form>
 			<div>
 				{successfulFetch ? (
 					<p>Subscribed Successfully!</p>
 				) : (
-					<p>{errorMessage}</p>
+					errorMessage && <p>{errorMessage}</p>
 				)}
 			</div>
 		</>
