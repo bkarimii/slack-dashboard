@@ -15,12 +15,18 @@ function SubscribtionForm() {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ email: subscribedUserEmail }),
+				body: JSON.stringify({ email: subscribedUserEmail.trim() }),
 			});
 			if (postedEmail.ok) {
 				setSuccessfulFetch(true);
+				setSubscribedUserEmail("");
 			} else {
-				const responseData = await postedEmail.json();
+				let responseData;
+				try {
+					responseData = await postedEmail.json();
+				} catch {
+					responseData = { message: "Unexpected response format" };
+				}
 				setErrorMessage(responseData.message || "An error occurred");
 				setSuccessfulFetch(false);
 			}
@@ -45,7 +51,9 @@ function SubscribtionForm() {
 					onChange={(e) => setSubscribedUserEmail(e.target.value)}
 					required
 				/>
-				<button type="submit">Subscribe</button>
+				<button type="submit" disabled={successfulFetch}>
+					Subscribe
+				</button>
 			</form>
 			<div>
 				{successfulFetch ? (
