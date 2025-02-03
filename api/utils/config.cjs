@@ -9,7 +9,7 @@ const dotenvPath = resolve(
 
 configDotenv({ path: dotenvPath });
 
-requireArgs(["DATABASE_URL", "SLACK_TOKEN"]);
+requireArgs(["DATABASE_URL"]);
 
 const databaseUrl = new URL(process.env.DATABASE_URL);
 
