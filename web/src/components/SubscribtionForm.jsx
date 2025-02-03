@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-function SubscribtionForm() {
+function SubscriptionForm() {
 	const [subscribedUserEmail, setSubscribedUserEmail] = useState("");
 	const [successfulFetch, setSuccessfulFetch] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
-	const url = "/api/user-subscribtion";
+	const url = "/api/user-subscription";
 
-	const fetchUsersSubscribtion = async () => {
+	const fetchUsersSubscription = async () => {
 		try {
 			// Clear previous error messages
 			setErrorMessage("");
@@ -38,7 +38,7 @@ function SubscribtionForm() {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		fetchUsersSubscribtion();
+		fetchUsersSubscription();
 	};
 
 	return (
@@ -66,4 +66,4 @@ function SubscribtionForm() {
 	);
 }
 
-export { SubscribtionForm };
+export { SubscriptionForm as SubscriptionForm };
