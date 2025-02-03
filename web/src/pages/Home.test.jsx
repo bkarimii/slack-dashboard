@@ -10,9 +10,9 @@ describe("Home component", () => {
 		server.use(http.get("/api/message", () => HttpResponse.text(""))),
 	);
 
-	it("renders the login button", () => {
+	it("renders the submit button", () => {
 		render(<Home />);
-		const submit = screen.getByRole("button", { name: /submit/i });
+		const submit = screen.getByRole("button", { name: /Subscribe/i });
 		expect(submit).toBeInTheDocument();
 	});
 });
