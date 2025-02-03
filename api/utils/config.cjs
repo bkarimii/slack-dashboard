@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 const { join, resolve } = require("node:path");
 
+const { WebClient } = require("@slack/web-api");
 const { configDotenv } = require("dotenv");
 
 const dotenvPath = resolve(
@@ -13,6 +14,7 @@ requireArgs(["DATABASE_URL", "SLACK_TOKEN"]);
 
 const databaseUrl = new URL(process.env.DATABASE_URL);
 const slackToken = process.env.SLACK_TOKEN;
+const web = new WebClient(slackToken);
 
 const localDb = [
 	"0.0.0.0",
@@ -41,7 +43,7 @@ module.exports = {
 	logLevel: process.env.LOG_LEVEL?.toLowerCase() ?? "info",
 	port: parseInt(process.env.PORT ?? "3000", 10),
 	production: process.env.NODE_ENV?.toLowerCase() === "production",
-	slackToken,
+	web,
 };
 
 function requireArgs(required) {
