@@ -80,6 +80,7 @@ jobs:
           echo 'LOG_LEVEL=debug' >> "$ENV_FILE"
           echo 'PORT=4321' >> "$ENV_FILE"
           echo 'NODE_ENV=docker' >> "$ENV_FILE"
+          echo 'SLACK_TOKEN=${{ secrets.SLACK_TOKEN }}' >> "$ENV_FILE"
           echo "file=$ENV_FILE" >> "$GITHUB_OUTPUT"
         env:
           ENV_FILE: docker.env
