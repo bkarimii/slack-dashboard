@@ -9,9 +9,10 @@ const dotenvPath = resolve(
 
 configDotenv({ path: dotenvPath });
 
-requireArgs(["DATABASE_URL"]);
+requireArgs(["DATABASE_URL", "SLACK_TOKEN"]);
 
 const databaseUrl = new URL(process.env.DATABASE_URL);
+const slackToken = process.env.SLACK_TOKEN;
 
 const localDb = [
 	"0.0.0.0",
@@ -40,6 +41,7 @@ module.exports = {
 	logLevel: process.env.LOG_LEVEL?.toLowerCase() ?? "info",
 	port: parseInt(process.env.PORT ?? "3000", 10),
 	production: process.env.NODE_ENV?.toLowerCase() === "production",
+	slackToken,
 };
 
 function requireArgs(required) {
