@@ -1,4 +1,4 @@
-# Starter Kit v2
+# Slack Project
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
