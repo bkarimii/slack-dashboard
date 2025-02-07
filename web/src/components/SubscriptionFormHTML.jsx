@@ -1,7 +1,5 @@
 import { Button, Input, Space, Flex, message } from "antd";
 
-import { SubscriptionLogo } from "./SubscriptionLogo";
-
 const SubscriptionFormHTML = () => {
 	// Function to validate email before submission
 	const validateEmail = (event) => {
@@ -18,7 +16,6 @@ const SubscriptionFormHTML = () => {
 	return (
 		<Flex justify="center" align="center" style={{ height: "100vh" }}>
 			<div>
-				<SubscriptionLogo />
 				<form action="/api/subscribe" method="post" onSubmit={validateEmail}>
 					<Space.Compact>
 						<Input
