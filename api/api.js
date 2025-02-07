@@ -21,6 +21,10 @@ api.post("/subscribe", async (req, res) => {
 			// Insert users data into DB here...
 
 			res.status(200).json({ sucess: true });
+		} else if (user.error === "An API error occurred: users_not_found") {
+			res.status(404).json({ sucess: false });
+		} else {
+			res.status(400).json({ sucess: false });
 		}
 	} catch (error) {
 		res.status(500).json({ message: "internal server error" });
