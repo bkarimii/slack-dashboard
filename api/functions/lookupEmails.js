@@ -35,7 +35,7 @@ async function lookupEmail(email) {
 						"The service is temporarily unavailable. Please try again later.",
 				};
 			} else if (errorType === "users_not_found") {
-				return { ok: false, error: "User not found." };
+				return { ok: false, error: "users not found" };
 			} else {
 				return { ok: false, error: `An unknown error occurred: ${errorType}` };
 			}
