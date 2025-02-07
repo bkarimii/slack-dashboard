@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import { lookupEmail } from "./functions/lookupEmails.js";
 import messageRouter from "./messages/messageRouter.js";
 
 const api = Router();
@@ -14,7 +15,7 @@ api.post("/subscribe", async (req, res) => {
 		}
 
 		// const user = await lookupEmail(email);
-		const user = null;
+		const user = await lookupEmail(email);
 
 		if (user.ok) {
 			// @todo Insert users data into DB here...
