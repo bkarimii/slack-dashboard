@@ -3,6 +3,7 @@ import { Router } from "express";
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
+import { lookupEmail } from "./functions/lookupEmails.js";
 import messageRouter from "./messages/messageRouter.js";
 
 const api = Router();
