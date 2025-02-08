@@ -28,6 +28,12 @@ const SubscriptionFormHTML = () => {
 					message.success("Subscription successful!");
 					form.reset();
 					setTimeout(() => navigate("/subscription/confirmation"), 1500);
+				} else if (response.status === 404) {
+					message.error("User not found! Please check your email.");
+				} else if (response.status === 400) {
+					message.error("Bad request. Please try again.");
+				} else {
+					message.error("Something went wrong. Try again later.");
 				}
 			} catch (error) {
 				message.error("An unexpected error occurred. Try again later.");
