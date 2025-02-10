@@ -3,7 +3,7 @@ import { Typography, Button, Row, Col } from "antd";
 
 const { Title, Text } = Typography;
 
-const ConfirmationPage = () => {
+export const ConfirmationPage = () => {
 	return (
 		<Row
 			justify="center"
@@ -30,7 +30,6 @@ const ConfirmationPage = () => {
 					Successfully subscribed!
 				</Title>
 
-				{/* Text */}
 				<Text>
 					You should receive <b>an email confirmation</b> shortly.
 				</Text>
@@ -53,5 +52,3 @@ const ConfirmationPage = () => {
 		</Row>
 	);
 };
-
-export default ConfirmationPage;
