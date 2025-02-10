@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { lookupEmail } from "./functions/lookupEmails.js";
+import { lookupEmail } from "./functions/lookupEmail.js";
 import messageRouter from "./messages/messageRouter.js";
 
 const api = Router();
@@ -18,9 +18,9 @@ api.post("/subscribe", async (req, res) => {
 		const user = await lookupEmail(email);
 
 		if (user.ok) {
-			// Insert users data into DB here...
+			// @todo Insert users data into DB here...
 
-			res.status(200).json({ sucess: true });
+			res.redirect("/subscribe/confirmation");
 		}
 	} catch (error) {
 		res.status(500).json({ message: "internal server error" });
