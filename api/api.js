@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { lookupEmail } from "./functions/lookupEmail.js";
+import { lookupEmail } from "./functions/lookupEmail.js";
 import messageRouter from "./messages/messageRouter.js";
 
 const api = Router();
@@ -19,12 +20,9 @@ api.post("/subscribe", async (req, res) => {
 
 		if (user.ok) {
 			// @todo Insert users data into DB here...
+			// @todo Insert users data into DB here...
 
 			res.redirect("/subscribe/confirmation");
-		} else if (user.error === "An API error occurred: users_not_found") {
-			res.status(404).json({ sucess: false });
-		} else {
-			res.status(400).json({ sucess: false });
 		}
 	} catch (error) {
 		res.status(500).json({ message: "internal server error" });
