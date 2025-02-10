@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { lookupEmail } from "./functions/lookupEmails.js";
+import { lookupEmail } from "./functions/lookupEmail.js";
 import messageRouter from "./messages/messageRouter.js";
 
 const api = Router();
@@ -14,13 +14,14 @@ api.post("/subscribe", async (req, res) => {
 			res.status(400).json({ sucess: false, message: "bad request" });
 		}
 
-		// const user = await lookupEmail(email);
 		const user = await lookupEmail(email);
 
 		if (user.ok) {
+			
 			// @todo Insert users data into DB here...
 
 			res.redirect("/subscribe/confirmation");
+
 		} else {
 			// Redirect to error page with appropriate error status
 			switch (user.error) {
