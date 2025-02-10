@@ -2,11 +2,14 @@ import config from "../utils/config.cjs";
 
 async function lookupEmail(email) {
 	try {
-		// Use callWithRetry to handle rate limits
+		// @todo Use callWithRetry to handle rate limits
 		const response = await config.web.users.lookupByEmail({ email });
 
 		// Extract and format user data
 		const user = response.user;
+		if (!user) {
+			return { ok: false, error: "User not found in response." };
+		}
 
 		const formattedUser = {
 			userId: user.id,
