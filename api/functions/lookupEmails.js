@@ -1,51 +1,12 @@
 import config from "../utils/config.cjs";
-import { callWithRetry } from "../utils/throttling.js";
 
 async function lookupEmail(email) {
 	try {
 		// Use callWithRetry to handle rate limits
-		const response = await callWithRetry(config.web.users.lookupByEmail, {
-			email,
-		});
-
-		// Check if response is valid
-		if (!response || !response.ok) {
-			const errorType = response?.error || "unknown_error";
-
-			// List of important error provided by slack
-			const fatalErrors = ["fatal_error", "internal_error"];
-			const requestErrors = ["request_timeout"];
-			const serviceErrors = ["service_unavailable"];
-
-			if (fatalErrors.includes(errorType)) {
-				return {
-					ok: false,
-					error: "A critical server error occurred.try again later.",
-				};
-			} else if (requestErrors.includes(errorType)) {
-				return {
-					ok: false,
-					error:
-						"The request was missing or incomplete. check your input and try again.",
-				};
-			} else if (serviceErrors.includes(errorType)) {
-				return {
-					ok: false,
-					error:
-						"The service is temporarily unavailable. Please try again later.",
-				};
-			} else if (errorType === "users_not_found") {
-				return { ok: false, error: "users not found" };
-			} else {
-				return { ok: false, error: `An unknown error occurred: ${errorType}` };
-			}
-		}
+		const response = await config.web.users.lookupByEmail({ email });
 
 		// Extract and format user data
 		const user = response.user;
-		if (!user) {
-			return { ok: false, error: "User not found in response." };
-		}
 
 		const formattedUser = {
 			userId: user.id,
