@@ -1,54 +1,23 @@
 import { Button, Input, Space, message } from "antd";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const SubscriptionFormHTML = () => {
-	const navigate = useNavigate();
-	const [loading, setLoading] = useState(false);
+	const [errorState, setErrorState] = useState({
+		isError: false,
+		errorType: "",
+	});
+
+	// Handles setErrorState to prevent the no-unused-vars ESLint error
+	// @todo After adding response handling for the POST request, this should be removed and placed in the submit handler.
+	useEffect(() => {
+		setErrorState({ isError: false, errorType: "" });
+	}, []);
 
 	useEffect(() => {
-		const form = document.querySelector("#subscription-form");
-
-		const handleSubmit = async (event) => {
-			event.preventDefault();
-			setLoading(true);
-
-			const email = form.querySelector("[name=email]").value;
-
-			try {
-				const response = await fetch(form.action, {
-					method: form.method,
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded",
-					},
-					body: new URLSearchParams({ email }),
-				});
-
-				if (response.ok) {
-					message.success("Subscription successful!");
-					form.reset();
-					setTimeout(() => navigate("/subscription/confirmation"), 1500);
-				} else if (response.status === 404) {
-					message.error("User not found! Please check your email.");
-				} else if (response.status === 400) {
-					message.error("Bad request. Please try again.");
-				} else {
-					message.error("Something went wrong. Try again later.");
-				}
-			} catch (error) {
-				message.error("An unexpected error occurred. Try again later.");
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		form.addEventListener("submit", handleSubmit);
-
-		return () => {
-			form.removeEventListener("submit", handleSubmit);
-		};
-	}, [navigate]);
-
+		if (errorState.isError) {
+			message.error(errorState.errorType);
+		}
+	}, [errorState]);
 	return (
 		<div>
 			<form action="/api/subscribe" method="post" id="subscription-form">
@@ -59,8 +28,8 @@ const SubscriptionFormHTML = () => {
 						placeholder="Enter your email"
 						required
 					/>
-					<Button type="primary" htmlType="submit" disabled={loading}>
-						{loading ? "Subscribing..." : "Subscribe"}
+					<Button type="primary" htmlType="submit">
+						Subscribe
 					</Button>
 				</Space.Compact>
 			</form>
