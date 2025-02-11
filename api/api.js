@@ -35,7 +35,6 @@ api.post("/subscribe", async (req, res) => {
 			);
 
 			res.redirect("/subscribe/confirmation");
-
 		} else {
 			// Redirect to error page with appropriate error status
 			switch (user.error) {
