@@ -29,7 +29,8 @@ function Subscribe() {
 			<Flex vertical gap={24}>
 				{/* TODO: Add subscription form */}
 				<Typography.Paragraph type="secondary" align="center">
-					Subscribe now and help shape a tool that empowers you to succeed! 🚀
+					Subscribe now and help shape a tool that empowers you to succeed!{" "}
+					<Typography.Text type="primary">🚀</Typography.Text>
 				</Typography.Paragraph>
 			</Flex>
 		</Flex>
