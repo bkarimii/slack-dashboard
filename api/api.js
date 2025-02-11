@@ -17,11 +17,9 @@ api.post("/subscribe", async (req, res) => {
 		const user = await lookupEmail(email);
 
 		if (user.ok) {
-			
 			// @todo Insert users data into DB here...
 
 			res.redirect("/subscribe/confirmation");
-
 		} else {
 			// Redirect to error page with appropriate error status
 			switch (user.error) {
