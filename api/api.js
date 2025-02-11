@@ -9,7 +9,6 @@ api.use("/message", messageRouter);
 
 api.post("/subscribe", async (req, res) => {
 	const email = req.body.email;
-
 	try {
 		if (!email) {
 			res.status(400).json({ sucess: false, message: "bad request" });
