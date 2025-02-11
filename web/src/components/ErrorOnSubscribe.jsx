@@ -9,7 +9,7 @@ function ErrorOnSubscribe() {
 		case "something-went-wrong":
 			return <p>Something went wrong.</p>;
 		default:
-			return null; // No error or unrecognized error status
+			return <p>Unkown error happened.</p>;
 	}
 }
 
