@@ -21,13 +21,16 @@ api.post("/subscribe", async (req, res) => {
 			// @todo Insert users data into DB here...
 
 			res.redirect("/subscribe/confirmation");
-		} else if (user.error === "An API error occurred: users_not_found") {
-			res.status(404).json({ sucess: false });
+		}
+		if (user.error === "An API error occurred: users_not_found") {
+			return res.redirect("/subscribe/error?status=not-found");
+		} else if (user.error === "An API error occurred: unauthorised") {
+			return res.redirect("/subscribe/error?status=unauthorised");
 		} else {
-			res.status(400).json({ sucess: false });
+			return res.redirect("/subscribe/error?status=something-went-wrong");
 		}
 	} catch (error) {
-		res.status(500).json({ message: "internal server error" });
+		return res.redirect("/subscribe/error?status=internal-error");
 	}
 });
 
