@@ -38,7 +38,7 @@ api.post("/subscribe", async (req, res) => {
 			res.redirect("/subscribe/confirmation");
 		}
 	} catch (error) {
-		res.status(500).json({ message: "internal server error" });
+		return res.redirect("/subscribe/error?status=server-error");
 	}
 });
 
