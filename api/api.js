@@ -35,9 +35,23 @@ api.post("/subscribe", async (req, res) => {
 			);
 
 			res.redirect("/subscribe/confirmation");
+		} else {
+			// Redirect to error page with appropriate error status
+			switch (user.error) {
+				case "users not found":
+					return res.redirect("/subscribe/error?status=not-found");
+				case "A critical server error occurred.try again later.":
+					return res.redirect("/subscribe/error?status=server-error");
+				case "The request was missing or incomplete. check your input and try again.":
+					return res.redirect("/subscribe/error?status=bad-request");
+				case "The service is temporarily unavailable. Please try again later.":
+					return res.redirect("/subscribe/error?status=service-unavailable");
+				default:
+					return res.redirect(`/subscribe/error?status=unknown-error&message`);
+			}
 		}
 	} catch (error) {
-		res.status(500).json({ message: "internal server error" });
+		return res.redirect("/subscribe/error?status=server-error");
 	}
 });
 
