@@ -8,6 +8,8 @@ function ErrorOnSubscribe() {
 			return <p>The user you are looking for does not exist.</p>;
 		case "something-went-wrong":
 			return <p>Something went wrong.</p>;
+		case "duplicate":
+			return <p>This email address already exists.</p>;
 		default:
 			return <p>Unkown error happened.</p>;
 	}
