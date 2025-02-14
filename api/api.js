@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import messageRouter from "./messages/messageRouter.js";
@@ -18,8 +19,21 @@ api.post("/subscribe", async (req, res) => {
 		const user = await lookupEmail(email);
 
 		if (user.ok) {
-			// @todo Insert users data into DB here...
-			// @todo Insert users data into DB here...
+			// Check if the user is already subscribed
+			const existingUser = await db.query(
+				"SELECT * FROM subscriptions WHERE email = $1",
+				[email],
+			);
+
+			if (existingUser.rowCount > 0) {
+				return res.redirect("/subscribe/error?status=duplicate");
+			}
+
+			// Insert user into the database
+			await db.query(
+				"INSERT INTO subscriptions (email, created_at) VALUES ($1, NOW())",
+				[email],
+			);
 
 			res.redirect("/subscribe/confirmation");
 		}
