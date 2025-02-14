@@ -1,3 +1,178 @@
+# 📊 Slack Activity Dashboard
+
+[![GitHub stars](https://img.shields.io/github/stars/bkarimii/slack-dashboard)](https://github.com/bkarimii/slack-dashboard/stargazers)
+[![GitHub last commit](https://img.shields.io/github/last-commit/bkarimii/slack-dashboard)](https://github.com/bkarimii/slack-dashboard/commits/main)
+[![GitHub issues](https://img.shields.io/github/issues/bkarimii/slack-dashboard)](https://github.com/bkarimii/slack-dashboard/issues)
+[![GitHub forks](https://img.shields.io/github/forks/bkarimii/slack-dashboard)](https://github.com/bkarimii/slack-dashboard/network/members)
+[![GitHub contributors](https://img.shields.io/github/contributors/bkarimii/slack-dashboard?color=blue)](https://github.com/bkarimii/slack-dashboard/graphs/contributors)
+[![GitHub license](https://img.shields.io/github/license/bkarimii/slack-dashboard)](https://github.com/bkarimii/slack-dashboard/blob/main/LICENSE)
+
+[![Slack](https://img.shields.io/badge/slack-%20-blue)](https://slack.com/)
+[![GitHub pull requests](https://img.shields.io/github/pulls/bkarimii/slack-dashboard)](https://github.com/bkarimii/slack-dashboard/pulls)
+
+## Links
+
+- **[View on GitHub](https://github.com/bkarimii/slack-dashboard)**
+- **[Download ZIP](https://github.com/bkarimii/slack-dashboard/archive/refs/heads/main.zip)**
+- **[Open an Issue](https://github.com/bkarimii/slack-dashboard/issues)**
+- **[Submit a Pull Request](https://github.com/bkarimii/slack-dashboard/pulls)**
+- **[Documentation](https://github.com/bkarimii/slack-dashboard/wiki)**
+
+## 📌 Overview
+
+Slack is the main communication hub for the CYF (CodeYourFuture) community. With a high volume of messages and calls across multiple groups and channels, it can be difficult to track **who is active** and **how much they are engaging**. This project provides a **Slack Activity Dashboard** to monitor communication levels, ensuring that no one goes silent and that trainees stay engaged.
+
+## 🔥 Features
+
+- 📊 **Track Slack Activity** – See who is active, how often they communicate, and their level of engagement.
+- 👥 **Cohort Management** – Group trainees based on regions, Slack channels, and engagement levels.
+- 📌 **Trainee Profiles** – View individual statistics on messages and calls per week.
+- 🎯 **Mentor Dashboard** – Set communication targets for trainees and track their progress.
+- 🔔 **Notifications** _(Stretch Goal)_ – Prompt trainees to re-engage if inactive.
+- 🔗 **Integrations** _(Stretch Goal)_ – Sync data with Google Sheets for extended tracking.
+
+## 🛠 Tech Stack
+
+- **Backend**: Node.js (LTS), Express.js, PostgreSQL (via `pg`)
+- **Frontend**: React (with Vite), React Router
+- **Testing**: Jest, Vitest, SuperTest, TestContainers, Playwright (E2E)
+- **Logging**: Winston, Morgan
+- **CI/CD**: GitHub Actions
+- **Deployment**: Google App Engine, Heroku, Render, Vercel
+- **Containerisation**: Docker
+
+## ⚙️Installation & Setup
+
+### Prerequisites
+
+- Install [Node.js LTS](https://nodejs.org/en/)
+- Install [Docker](https://www.docker.com/)
+- Install [PostgreSQL](https://www.postgresql.org/)
+- Install dependencies:
+  ```sh
+  npm install
+  ```
+
+### Running Locally
+
+1. **Start the Backend:**
+   ```sh
+   npm run dev
+   ```
+2. **Start the Frontend:**
+   ```sh
+   cd client && npm start
+   ```
+3. **Run Tests:**
+   ```sh
+   npm test
+   ```
+
+## 🚀 Deployment
+
+Click the **Deploy to Render** button below:
+
+Alternatively, deploy using Docker:
+
+```sh
+docker-compose up --build
+```
+
+## 🔒 Security Considerations
+
+If handling Personally Identifiable Information (PII), ensure:
+
+- 🚧 **Minimal Data Collection** – Only collect essential information.
+- 🔐 **Restricted Access** – Data should be accessible only to authorised users.
+- ✅ **Authentication** – Use GitHub authentication; avoid ad-hoc solutions.
+- 📝 **Auditing** – Maintain logs to track data access.
+- 🛡️ **Secure APIs** – Avoid relying on frontend security alone.
+- 👨‍💻 **Code Reviews** – Senior developers must review before deployment.
+
+## 🤝 Contribution Guide
+
+We welcome contributions! Follow these steps:
+
+1. Fork the repository
+2. Clone it locally:
+   ```sh
+   git clone https://github.com/bkarimii/slack-dashboard.git
+   ```
+3. Create a new branch:
+   ```sh
+   git checkout -b feature-branch
+   ```
+4. Make your changes and commit:
+   ```sh
+   git commit -m "Add new feature"
+   ```
+5. Push to GitHub and open a Pull Request:
+   ```sh
+   git push origin feature-branch
+   ```
+   Great! Let's add the **Tech Lead** section to give it an extra touch of recognition. I'll continue with the same style to make it cohesive, but with a bit more emphasis on their leadership role.
+
+---
+
+## 🌟 **Our Amazing Contributors**
+
+This project wouldn't be the same without the incredible contributions of our team. A huge thank you to each of you for your hard work and dedication!
+
+### 👨‍💻 **Tech Lead**
+
+#### 🥇[oliverlloyd](https://github.com/oliverlloyd)
+
+<img src="https://github.com/oliverlloyd.png" width="50" style="border-radius: 50%; border: 3px solid #FFC107; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-right: 20px;" align="left">
+
+The guiding force behind the project, overseeing architecture, design, and decision-making. Leading by example, ensuring we stay on track with goals, and bringing out the best in the team.
+
+---
+
+### 💻 **Backend Developer**
+
+#### 💻 **[bkarimii](https://github.com/bkarimii)**
+
+<img src="https://github.com/bkarimii.png" width="50" style="border-radius: 50%; border: 3px solid #4CAF50; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-right: 20px;" align="left">
+
+The backbone of the project! With expertise in server-side development, ensuring smooth data handling and architecture. Your work powers everything behind the scenes.
+
+---
+
+### 🎨 **Frontend Developers**
+
+#### 🚀 **[ebrahimbeiati](https://github.com/ebrahimbeiati)**
+
+<img src="https://github.com/ebrahimbeiati.png" width="50" style="border-radius: 50%; border: 3px solid #2196F3; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-right: 20px;" align="left">  
+Creating pixel-perfect designs with a touch of elegance. Always pushing the limits of what's possible in user interaction and experience.
+
+#### 🌟 **[jordan-choi](https://github.com/jordan-choi)**
+
+<img src="https://github.com/jordan-choi.png" width="50" style="border-radius: 50%; border: 3px solid #2196F3; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-right: 20px;" align="left">  
+Making web interfaces feel alive! A creative force behind beautiful and functional designs that are both intuitive and stunning.
+
+---
+
+### 🔥 **A Team of Passionate Developers**
+
+These contributors have made this project what it is today, each bringing their unique skills and talents. If you’re interested in their work, feel free to visit their profiles, check out their repositories, and connect with them!
+
+---
+
+**New Highlights:**
+
+- **Tech Lead**: The tech lead is emphasized with a gold border to distinguish their leadership role, symbolizing guidance and oversight.
+- The **descriptions** highlight the responsibility of leadership, making it clear how crucial the Tech Lead's contributions are to the project's success.
+
+This format keeps the style consistent while elevating the Tech Lead’s role. It’s clean, creative, and reflects the contributions of each team member in a clear, engaging way!
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
+
+## 📞 Contact
+
+For support, check the [wiki](https://github.com/bkarimii/slack-dashboard/wiki) or join `#cyf-full-stack-starter-kit` on [Slack](https://codeyourfuture.slack.com/archives/C021ATWS9A5).
+
 # Starter Kit v2
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
