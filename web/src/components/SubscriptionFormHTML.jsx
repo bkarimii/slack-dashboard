@@ -3,11 +3,10 @@ import { Button, Input, Space } from "antd";
 const SubscriptionFormHTML = () => {
 	return (
 		<div>
-			<form action="/api/subscribe" method="post">
+			<form action="/api/subscribe" method="post" id="subscription-form">
 				<Space.Compact>
 					<Input
 						type="email"
-						id="email"
 						name="email"
 						placeholder="Enter your email"
 						required
