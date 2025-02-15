@@ -1,5 +1,6 @@
 import { Flex, Typography } from "antd";
 
+import { SubscriptionFormHTML } from "../components/SubscriptionFormHTML";
 import { SubscriptionLogo } from "../components/SubscriptionLogo";
 
 function Subscribe() {
@@ -32,7 +33,7 @@ function Subscribe() {
 				</Flex>
 
 				<Flex vertical gap={24}>
-					{/* TODO: Add subscription form */}
+					<SubscriptionFormHTML />
 					<Typography.Paragraph type="secondary" align="center">
 						Subscribe now and help shape a tool that empowers you to succeed!{" "}
 						<Typography.Text type="primary">🚀</Typography.Text>
