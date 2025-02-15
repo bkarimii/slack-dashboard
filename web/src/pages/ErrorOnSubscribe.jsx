@@ -5,9 +5,11 @@ function ErrorOnSubscribe() {
 		case "unauthorised":
 			return <p>An unauthorised error has occurred.</p>;
 		case "not-found":
-			return <p>The user you are looking for does not exist.</p>;
+			return <p>user not found</p>;
 		case "something-went-wrong":
 			return <p>Something went wrong.</p>;
+		case "duplicate":
+			return <p>the email address you entred already exist.</p>;
 		default:
 			return <p>Unkown error happened.</p>;
 	}
