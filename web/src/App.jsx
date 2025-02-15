@@ -14,7 +14,7 @@ function App() {
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/nested/about/path" element={<About />} />
-			<Route path="/subscribe/confirmation" element={<ConfirmationPage />} />
+				<Route path="/subscribe/confirmation" element={<ConfirmationPage />} />
 				<Route path="/subscribe" element={<Subscribe />} />
 			</Routes>
 		</ConfigProvider>
