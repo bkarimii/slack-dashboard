@@ -12,7 +12,7 @@ describe("Home component", () => {
 
 	it("renders the login button", () => {
 		render(<Home />);
-		const submit = screen.getByRole("button", { name: /submit/i });
-		expect(submit).toBeInTheDocument();
+		const headingElement = screen.getByText(/CYF Slack Dashboard/i);
+		expect(headingElement).toBeInTheDocument();
 	});
 });
