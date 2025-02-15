@@ -10,9 +10,11 @@ describe("Home component", () => {
 		server.use(http.get("/api/message", () => HttpResponse.text(""))),
 	);
 
-	it("renders the login button", () => {
+	it("renders the heading", () => {
 		render(<Home />);
-		const submit = screen.getByRole("button", { name: /submit/i });
-		expect(submit).toBeInTheDocument();
+		const heading = screen.getByRole("heading", {
+			name: /CYF Slack Dashboard/i,
+		});
+		expect(heading).toBeInTheDocument();
 	});
 });
