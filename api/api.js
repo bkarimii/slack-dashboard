@@ -23,14 +23,13 @@ api.post("/subscribe", async (req, res) => {
 				"SELECT * FROM subscriptions WHERE email = $1",
 				[email],
 			);
-
 			if (existingUser.rowCount > 0) {
 				return res.redirect("/subscribe/error?status=duplicate");
 			}
 
 			// Insert user into the database
 			await db.query(
-				"INSERT INTO subscriptions (email, created_at) VALUES ($1, NOW())",
+				"INSERT INTO subscriptions (email, subscribed_at) VALUES ($1, NOW())",
 				[email],
 			);
 
@@ -38,7 +37,7 @@ api.post("/subscribe", async (req, res) => {
 		} else {
 			// Redirect to error page with appropriate error status
 			switch (user.error) {
-				case "users not found":
+				case "An API error occurred: users_not_found":
 					return res.redirect("/subscribe/error?status=not-found");
 				case "A critical server error occurred.try again later.":
 					return res.redirect("/subscribe/error?status=server-error");
