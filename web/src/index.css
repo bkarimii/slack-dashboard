@@ -1,0 +1,17 @@
+/* Ant Design Typography */
+.ant-typography,
+h2.ant-typography,
+h5.ant-typography {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+.ant-typography h2.ant-typography,
+h2.ant-typography {
+	font-weight: 500;
+}
+
+.ant-typography h5.ant-typography,
+h5.ant-typography {
+	font-weight: 400;
+}
