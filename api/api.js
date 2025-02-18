@@ -54,4 +54,14 @@ api.post("/subscribe", async (req, res) => {
 	}
 });
 
+api.get("/fetch-users", async (req, res) => {
+	try {
+		const result = await db.query("SELECT * FROM all_users");
+
+		res.status(200).json(result.rows);
+	} catch (error) {
+		res.status(500).json({ message: "Internal Server Error" });
+	}
+});
+
 export default api;
