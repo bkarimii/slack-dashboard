@@ -58,7 +58,11 @@ api.get("/fetch-users", async (req, res) => {
 	try {
 		const result = await db.query("SELECT * FROM all_users");
 
-		res.status(200).json(result.rows);
+		if (!result.rows.length === 0) {
+			res.status(404).json({ success: false, message: "User not fund" });
+		} else {
+			res.status(200).json(result.rows);
+		}
 	} catch (error) {
 		res.status(500).json({ message: "Internal Server Error" });
 	}
