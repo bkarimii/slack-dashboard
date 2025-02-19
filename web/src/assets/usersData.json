@@ -1,0 +1,58 @@
+{
+	"user": [
+		{
+			"userId": "U088K50CAP9",
+			"title": "",
+			"name": "behrouz1993",
+			"realName": "BehrouzTwo",
+			"realNameNormalised": "BehrouzTwo",
+			"displayName": null,
+			"displayNameNormalised": "BehrouzTwo",
+			"firstname": "BehrouzTwo",
+			"lastname": "",
+			"isAdmin": false,
+			"isOwner": false,
+			"isBot": false,
+			"isAppUser": false,
+			"image_72": "https://secure.gravatar.com/avatar/afb223cca8b979e68c6af0aa8b84a7fb.jpg?s=72&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0021-72.png",
+			"image_192": "https://secure.gravatar.com/avatar/afb223cca8b979e68c6af0aa8b84a7fb.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0021-192.png",
+			"updated": 1737044953
+		},
+		{
+			"userId": "U088K50CAP10",
+			"title": "Mr.",
+			"name": "john_doe",
+			"realName": "John Doe",
+			"realNameNormalised": "JohnDoe",
+			"displayName": "johndoe123",
+			"displayNameNormalised": "JohnDoe123",
+			"firstname": "John",
+			"lastname": "Doe",
+			"isAdmin": true,
+			"isOwner": false,
+			"isBot": false,
+			"isAppUser": true,
+			"image_72": "https://secure.gravatar.com/avatar/1af223cca8b979e68c6af0aa8b84a7fb.jpg?s=72&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0021-72.png",
+			"image_192": "https://secure.gravatar.com/avatar/1af223cca8b979e68c6af0aa8b84a7fb.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0021-192.png",
+			"updated": 1737044954
+		},
+		{
+			"userId": "U088K50CAP11",
+			"title": "Dr.",
+			"name": "alice_smith",
+			"realName": "Alice Smith",
+			"realNameNormalised": "AliceSmith",
+			"displayName": "alicesmith321",
+			"displayNameNormalised": "AliceSmith321",
+			"firstname": "Alice",
+			"lastname": "Smith",
+			"isAdmin": false,
+			"isOwner": true,
+			"isBot": true,
+			"isAppUser": true,
+			"image_72": "https://secure.gravatar.com/avatar/2af223cca8b979e68c6af0aa8b84a7fb.jpg?s=72&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0021-72.png",
+			"image_192": "https://secure.gravatar.com/avatar/2af223cca8b979e68c6af0aa8b84a7fb.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0021-192.png",
+			"updated": 1737044955
+		}
+	]
+}
