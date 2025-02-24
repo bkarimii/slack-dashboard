@@ -36,7 +36,7 @@ function Subscribe() {
 					</Typography.Title>
 				</Flex>
 
-				<Flex vertical gap={24}>
+				<Flex vertical gap={24} style={{ width: "100%" }}>
 					<SubscriptionFormHTML />
 					<Typography.Paragraph
 						type="secondary"
