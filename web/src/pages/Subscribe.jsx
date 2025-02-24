@@ -22,10 +22,14 @@ function Subscribe() {
 				</div>
 
 				<Flex vertical gap={24} align="center">
-					<Typography.Title level={2} align="center">
+					<Typography.Title level={2} style={{ textAlign: "center" }}>
 						Get early access to insights on your Slack activity
 					</Typography.Title>
-					<Typography.Title level={5} type="secondary" align="center">
+					<Typography.Title
+						level={5}
+						type="secondary"
+						style={{ textAlign: "center" }}
+					>
 						Get a weekly engagement score reflecting your activity and
 						involvement on Slack and get insights to track your contributions
 						and stay motivated.
@@ -34,7 +38,10 @@ function Subscribe() {
 
 				<Flex vertical gap={24}>
 					<SubscriptionFormHTML />
-					<Typography.Paragraph type="secondary" align="center">
+					<Typography.Paragraph
+						type="secondary"
+						style={{ textAlign: "center" }}
+					>
 						Subscribe now and help shape a tool that empowers you to succeed!{" "}
 						<Typography.Text type="primary">🚀</Typography.Text>
 					</Typography.Paragraph>
