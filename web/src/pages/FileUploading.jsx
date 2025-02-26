@@ -9,23 +9,30 @@ export const FileUploading = () => {
 	const [uploading, setUploading] = useState(false);
 
 	const handleUpload = () => {
+		if (fileList.length === 0) {
+			message.warning("Please select a file before uploading.");
+			return;
+		}
+
 		const formData = new FormData();
-		fileList.forEach((file) => {
-			formData.append("file", file);
-		});
+		formData.append("file", fileList[0]); // Ensure only 1 file is sent
+
 		setUploading(true);
 
 		fetch("https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload", {
 			method: "POST",
 			body: formData,
 		})
-			.then((res) => res.json())
+			.then((res) => {
+				if (!res.ok) throw new Error("Upload failed. Please try again.");
+				return res.json();
+			})
 			.then(() => {
 				setFileList([]); // Clear the file list after successful upload
 				message.success("Upload successful.");
 			})
-			.catch(() => {
-				message.error("Upload failed.");
+			.catch((error) => {
+				message.error(error.message || "Upload failed.");
 			})
 			.finally(() => {
 				setUploading(false);
@@ -33,17 +40,22 @@ export const FileUploading = () => {
 	};
 
 	const props = {
-		onRemove: (file) => {
-			setFileList((prevList) =>
-				prevList.filter((item) => item.uid !== file.uid),
-			);
+		onRemove: () => {
+			setFileList([]); // Ensure only one file is allowed
 		},
 		beforeUpload: (file) => {
 			if (file.type !== "application/zip" && !file.name.endsWith(".zip")) {
 				message.error("Only .zip files are allowed!");
 				return false;
 			}
-			setFileList((prevList) => [...prevList, file]);
+
+			// Allow only 1 file
+			if (fileList.length > 0) {
+				message.warning("You can only upload one file at a time.");
+				return false;
+			}
+
+			setFileList([file]); // Replace previous file
 			return false; // Prevent automatic upload
 		},
 		fileList,
@@ -77,11 +89,7 @@ export const FileUploading = () => {
 
 				<Divider />
 
-				<Upload
-					{...props}
-					showUploadList={{ showRemoveIcon: true }}
-					style={{ width: "100%" }}
-				>
+				<Upload {...props} showUploadList={{ showRemoveIcon: true }}>
 					<Button
 						icon={<UploadOutlined />}
 						style={{ width: "100%", marginBottom: 12 }}
