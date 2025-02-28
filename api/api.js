@@ -1,3 +1,4 @@
+import AdmZip from "adm-zip";
 import { Router } from "express";
 import multer from "multer";
 
@@ -87,27 +88,33 @@ const upload = multer({
 }).single("file");
 
 api.post("/upload", async (req, res) => {
-	try {
-		upload(req, res, (err) => {
-			if (err) {
-				return res
-					.status(400)
-					.json({ message: `File upload error: ${err.message}` });
-			}
+	upload(req, res, (err) => {
+		if (err) {
+			return res
+				.status(400)
+				.json({ message: `File upload error: ${err.message}` });
+		}
 
-			if (!req.file) {
-				res.status(404).json({ message: "file not fund" });
-			}
+		if (!req.file) {
+			res.status(404).json({ message: "file not fund" });
+		}
 
-			if (req.file.mimetype !== "application/zip") {
-				res.status(400).json({ message: "file must be a zip type" });
-			}
+		if (req.file.mimetype !== "application/zip") {
+			res.status(400).json({ message: "file must be a zip type" });
+		}
 
+		try {
+			const zip = new AdmZip(req.file.buffer);
+			const zipEntries = zip.getEntries();
+			// eslint-disable-next-line no-unused-vars
+			zipEntries.forEach((entry) => {
+				// @todo implement neccessary process on the data
+			});
 			res.status(200).json({ message: "File uploaded successfully!" });
-		});
-	} catch (error) {
-		res.status(500).json({ message: "internal server error" });
-	}
+		} catch (error) {
+			res.status(500).json({ message: "internal server error", err: error });
+		}
+	});
 });
 
 export default api;
