@@ -1,7 +1,11 @@
 import { decideScore } from "./decideScore.js";
 
-// eslint-disable-next-line jest/no-disabled-tests
 describe("decideScore", () => {
+	it("should return 0 when non-numeric arguments are passed to the function", () => {
+		const score = decideScore({ messages: "3", reactions: "4" });
+		expect(score).toBe(0);
+	});
+
 	it("should return 50 when there are 3 message and 4 reactions", () => {
 		const score = decideScore({ messages: 3, reactions: 4 });
 		expect(score).toBe(13);
