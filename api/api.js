@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
@@ -65,6 +66,47 @@ api.get("/fetch-users", async (req, res) => {
 		}
 	} catch (error) {
 		res.status(500).json({ message: "Internal Server Error" });
+	}
+});
+
+// Multer setup for handling file upload
+const storage = multer.memoryStorage();
+const fileFilter = (req, file, cb) => {
+	// Accept only zip files
+	if (file.mimetype === "application/zip") {
+		cb(null, true);
+	} else {
+		cb(new Error("Only zip files are allowed"), false);
+	}
+};
+
+const upload = multer({
+	storage: storage,
+	fileFilter: fileFilter,
+	limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB max size
+}).single("file");
+
+api.post("/upload", async (req, res) => {
+	try {
+		upload(req, res, (err) => {
+			if (err) {
+				return res
+					.status(400)
+					.json({ message: `File upload error: ${err.message}` });
+			}
+
+			if (!req.file) {
+				res.status(404).json({ message: "file not fund" });
+			}
+
+			if (req.file.mimetype !== "application/zip") {
+				res.status(400).json({ message: "file must be a zip type" });
+			}
+
+			res.status(200).json({ message: "File uploaded successfully!" });
+		});
+	} catch (error) {
+		res.status(500).json({ message: "internal server error" });
 	}
 });
 
