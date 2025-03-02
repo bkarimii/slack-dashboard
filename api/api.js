@@ -1,10 +1,10 @@
-import AdmZip from "adm-zip";
 import { Router } from "express";
-import multer from "multer";
 
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
+import { updateCounts } from "./functions/updateCounts.js";
 import messageRouter from "./messages/messageRouter.js";
+import upload from "./middleWares/multerConfig.js";
 
 const api = Router();
 
@@ -70,47 +70,29 @@ api.get("/fetch-users", async (req, res) => {
 	}
 });
 
-// Multer setup for handling file upload
-const storage = multer.memoryStorage();
-const fileFilter = (req, file, cb) => {
-	// Accept only zip files
-	if (file.mimetype === "application/zip") {
-		cb(null, true);
-	} else {
-		cb(new Error("Only zip files are allowed"), false);
-	}
-};
-
-const upload = multer({
-	storage: storage,
-	fileFilter: fileFilter,
-	limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB max size
-}).single("file");
-
 api.post("/upload", async (req, res) => {
 	upload(req, res, (err) => {
 		if (err) {
 			return res
 				.status(400)
-				.json({ message: `File upload error: ${err.message}` });
+				.json({ success: false, message: `File upload error: ${err.message}` });
 		}
 
 		if (!req.file) {
-			res.status(404).json({ message: "file not fund" });
+			res.status(404).json({ success: false, message: "file not fund" });
 		}
 
 		if (req.file.mimetype !== "application/zip") {
-			res.status(400).json({ message: "file must be a zip type" });
+			res
+				.status(400)
+				.json({ success: false, message: "file must be a zip type" });
 		}
 
 		try {
-			const zip = new AdmZip(req.file.buffer);
-			const zipEntries = zip.getEntries();
-			// eslint-disable-next-line no-unused-vars
-			zipEntries.forEach((entry) => {
-				// @todo implement neccessary process on the data
-			});
-			res.status(200).json({ message: "File uploaded successfully!" });
+			const zipBuffer = req.file.buffer;
+			const data = updateCounts(zipBuffer);
+
+			res.status(200).json({ success: true, data: data });
 		} catch (error) {
 			res.status(500).json({ message: "internal server error", err: error });
 		}
