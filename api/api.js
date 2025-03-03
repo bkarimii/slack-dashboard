@@ -2,7 +2,9 @@ import { Router } from "express";
 
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
+import { updateCounts } from "./functions/updateCounts.js";
 import messageRouter from "./messages/messageRouter.js";
+import upload from "./middleWares/multerConfig.js";
 
 const api = Router();
 
@@ -66,6 +68,35 @@ api.get("/fetch-users", async (req, res) => {
 	} catch (error) {
 		res.status(500).json({ message: "Internal Server Error" });
 	}
+});
+
+api.post("/upload", async (req, res) => {
+	upload(req, res, (err) => {
+		if (err) {
+			return res
+				.status(400)
+				.json({ success: false, message: `File upload error: ${err.message}` });
+		}
+
+		if (!req.file) {
+			res.status(404).json({ success: false, message: "file not fund" });
+		}
+
+		if (req.file.mimetype !== "application/zip") {
+			res
+				.status(400)
+				.json({ success: false, message: "file must be a zip type" });
+		}
+
+		try {
+			const zipBuffer = req.file.buffer;
+			const data = updateCounts(zipBuffer);
+
+			res.status(200).json({ success: true, data: data });
+		} catch (error) {
+			res.status(500).json({ message: "internal server error", err: error });
+		}
+	});
 });
 
 export default api;
