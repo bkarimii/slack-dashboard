@@ -1,20 +1,30 @@
-import { Button, Input, Space } from "antd";
+import { Typography } from "antd";
+
+import { ThemedButton } from "./ThemedButton";
+import { ThemedInput } from "./ThemedInput";
+
+import "./SubscriptionFormHTML.css";
 
 const SubscriptionFormHTML = () => {
 	return (
-		<div>
+		<div className="subscription-form__container">
 			<form action="/api/subscribe" method="post" id="subscription-form">
-				<Space.Compact>
-					<Input
+				<div className="subscription-form__layout">
+					<ThemedInput
 						type="email"
 						name="email"
-						placeholder="Enter your email"
+						placeholder="Enter your email linked to CYF Slack"
 						required
 					/>
-					<Button type="primary" htmlType="submit">
-						Subscribe
-					</Button>
-				</Space.Compact>
+					<ThemedButton type="primary" htmlType="submit">
+						<Typography.Title
+							level={5}
+							style={{ color: "#fff", fontStyle: "italic" }}
+						>
+							Subscribe
+						</Typography.Title>
+					</ThemedButton>
+				</div>
 			</form>
 		</div>
 	);
