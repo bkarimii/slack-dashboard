@@ -45,7 +45,7 @@ export const FileUploading = () => {
 		},
 		beforeUpload: (file) => {
 			if (file.type !== "application/zip" && !file.name.endsWith(".zip")) {
-				message.error("Only .zip files are allowed!");
+				message.error("You can only upload one file at a time.");
 				return false;
 			}
 
