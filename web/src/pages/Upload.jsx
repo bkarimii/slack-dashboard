@@ -9,30 +9,23 @@ export const FileUploading = () => {
 	const [uploading, setUploading] = useState(false);
 
 	const handleUpload = () => {
-		if (fileList.length === 0) {
-			message.warning("Please select a file before uploading.");
-			return;
-		}
-
 		const formData = new FormData();
-		formData.append("file", fileList[0]); // Ensure only 1 file is sent
-
+		fileList.forEach((file) => {
+			formData.append("file", file);
+		});
 		setUploading(true);
 
 		fetch("https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload", {
 			method: "POST",
 			body: formData,
 		})
-			.then((res) => {
-				if (!res.ok) throw new Error("Upload failed. Please try again.");
-				return res.json();
-			})
+			.then((res) => res.json())
 			.then(() => {
-				setFileList([]); // Clear the file list after successful upload
+				setFileList([]);
 				message.success("Upload successful.");
 			})
-			.catch((error) => {
-				message.error(error.message || "Upload failed.");
+			.catch(() => {
+				message.error("Upload failed.");
 			})
 			.finally(() => {
 				setUploading(false);
@@ -40,23 +33,18 @@ export const FileUploading = () => {
 	};
 
 	const props = {
-		onRemove: () => {
-			setFileList([]); // Ensure only one file is allowed
+		onRemove: (file) => {
+			setFileList((prevList) =>
+				prevList.filter((item) => item.uid !== file.uid),
+			);
 		},
 		beforeUpload: (file) => {
 			if (file.type !== "application/zip" && !file.name.endsWith(".zip")) {
-				message.error("You can only upload one file at a time.");
+				message.error("You can only upload ZIP files.");
 				return false;
 			}
-
-			// Allow only 1 file
-			if (fileList.length > 0) {
-				message.warning("You can only upload one file at a time.");
-				return false;
-			}
-
-			setFileList([file]); // Replace previous file
-			return false; // Prevent automatic upload
+			setFileList((prevList) => [...prevList, file]);
+			return true; // Allow the file to be added to the list
 		},
 		fileList,
 		accept: ".zip",
@@ -69,12 +57,14 @@ export const FileUploading = () => {
 				justifyContent: "center",
 				alignItems: "center",
 				height: "100vh",
+				padding: "16px",
 				backgroundColor: "#f4f6f8",
 			}}
 		>
 			<Card
 				style={{
-					width: 500,
+					width: "100%",
+					maxWidth: 500, // ✅ Responsive fix: works on mobile & desktop
 					textAlign: "center",
 					padding: "24px",
 					borderRadius: "10px",
@@ -82,10 +72,43 @@ export const FileUploading = () => {
 				}}
 			>
 				<CloudUploadOutlined style={{ fontSize: "50px", color: "#1890ff" }} />
+
+				{/* 🔽 Updated Title + Instructions 🔽 */}
 				<Title level={3} style={{ marginTop: 16 }}>
-					Upload a ZIP File
+					Upload Your Slack Export ZIP File
 				</Title>
-				<Text type="secondary">Only .zip files are allowed (Max: 1 file)</Text>
+				<Text type="secondary">
+					This page allows you to upload a ZIP file containing your exported
+					Slack data. If you haven&apos;t exported your Slack workspace data
+					yet, follow the steps below.
+				</Text>
+				<Divider />
+
+				<Title level={5}>How to Export Your Slack Data:</Title>
+				<ul style={{ textAlign: "left", paddingLeft: 24 }}>
+					<li>Go to your Slack workspace settings.</li>
+					<li>
+						Navigate to{" "}
+						<strong>Settings & Administration → Workspace settings</strong>.
+					</li>
+					<li>
+						Find the <strong>Import/Export Data</strong> section.
+					</li>
+					<li>Request an export and download the resulting ZIP file.</li>
+				</ul>
+
+				<Text type="secondary">
+					For detailed instructions, check out{" "}
+					<a
+						href="https://slack.com/help/articles/201658943-Export-your-workspace-data"
+						target="_blank"
+						rel="noopener noreferrer"
+						style={{ marginLeft: 4 }}
+					>
+						this Slack help article.
+					</a>
+				</Text>
+				{/* 🔼 End of Updated Instructions 🔼 */}
 
 				<Divider />
 
@@ -98,15 +121,22 @@ export const FileUploading = () => {
 					</Button>
 				</Upload>
 
+				{/* 🔽 Updated Button (Now Always Enabled) 🔽 */}
 				<Button
 					type="primary"
-					onClick={handleUpload}
-					disabled={fileList.length === 0}
+					onClick={() => {
+						if (fileList.length === 0) {
+							message.error("Please select a ZIP file before uploading.");
+							return;
+						}
+						handleUpload();
+					}}
 					loading={uploading}
 					style={{ width: "100%", marginTop: 12 }}
 				>
 					{uploading ? "Uploading..." : "Start Upload"}
 				</Button>
+				{/* 🔼 End of Button Update 🔼 */}
 			</Card>
 		</div>
 	);
