@@ -8,7 +8,7 @@ import { ErrorOnSubscribe } from "./pages/ErrorOnSubscribe.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Subscribe from "./pages/Subscribe.jsx";
-import { FileUpload } from "./pages/Upload.jsx";
+import { FileUploading } from "./pages/Upload.jsx";
 import { theme } from "./theme.js";
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
 				<Route path="/subscribe" element={<Subscribe />} />
 				<Route path="/subscribe/confirmation" element={<ConfirmationPage />} />
 				<Route path="/subscribe/error" element={<ErrorOnSubscribe />} />
-				<Route path="/upload" element={<FileUpload />} />
+				<Route path="/upload" element={<FileUploading />} />
 			</Routes>
 		</ConfigProvider>
 	);
