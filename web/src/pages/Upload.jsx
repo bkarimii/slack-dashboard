@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const { Title, Text } = Typography;
 
-export const FileUploading = () => {
+export const FileUpload = () => {
 	const [fileList, setFileList] = useState([]);
 	const [uploading, setUploading] = useState(false);
 
