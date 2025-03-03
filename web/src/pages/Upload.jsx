@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const { Title, Text } = Typography;
 
-export const FileUploading = () => {
+export const FileUpload = () => {
 	const [fileList, setFileList] = useState([]);
 	const [uploading, setUploading] = useState(false);
 
@@ -15,9 +15,7 @@ export const FileUploading = () => {
 		}
 
 		const formData = new FormData();
-		fileList.forEach((file) => {
-			formData.append("file", file);
-		});
+		formData.append("file", fileList[0]); // Ensure only 1 file is sent
 
 		setUploading(true);
 
@@ -42,18 +40,23 @@ export const FileUploading = () => {
 	};
 
 	const props = {
-		onRemove: (file) => {
-			setFileList((prevList) =>
-				prevList.filter((item) => item.uid !== file.uid),
-			);
+		onRemove: () => {
+			setFileList([]); // Ensure only one file is allowed
 		},
 		beforeUpload: (file) => {
 			if (file.type !== "application/zip" && !file.name.endsWith(".zip")) {
-				message.error("You can only upload ZIP files.");
+				message.error("Only .zip files are allowed!");
 				return false;
 			}
-			setFileList((prevList) => [...prevList, file]);
-			return true; // Allow the file to be added to the list
+
+			// Allow only 1 file
+			if (fileList.length > 0) {
+				message.warning("You can only upload one file at a time.");
+				return false;
+			}
+
+			setFileList([file]); // Replace previous file
+			return false; // Prevent automatic upload
 		},
 		fileList,
 		accept: ".zip",
@@ -66,14 +69,12 @@ export const FileUploading = () => {
 				justifyContent: "center",
 				alignItems: "center",
 				height: "100vh",
-				padding: "16px",
 				backgroundColor: "#f4f6f8",
 			}}
 		>
 			<Card
 				style={{
-					width: "100%",
-					maxWidth: 500, // ✅ Responsive fix: works on mobile & desktop
+					width: 500,
 					textAlign: "center",
 					padding: "24px",
 					borderRadius: "10px",
@@ -81,41 +82,10 @@ export const FileUploading = () => {
 				}}
 			>
 				<CloudUploadOutlined style={{ fontSize: "50px", color: "#1890ff" }} />
-
 				<Title level={3} style={{ marginTop: 16 }}>
-					Upload Your Slack Export ZIP File
+					Upload a ZIP File
 				</Title>
-				<Text type="secondary">
-					This page allows you to upload a ZIP file containing your exported
-					Slack data. If you haven&apos;t exported your Slack workspace data
-					yet, follow the steps below.
-				</Text>
-				<Divider />
-
-				<Title level={5}>How to Export Your Slack Data:</Title>
-				<ul style={{ textAlign: "left", paddingLeft: 24 }}>
-					<li>Go to your Slack workspace settings.</li>
-					<li>
-						Navigate to{" "}
-						<strong>Settings & Administration → Workspace settings</strong>.
-					</li>
-					<li>
-						Find the <strong>Import/Export Data</strong> section.
-					</li>
-					<li>Request an export and download the resulting ZIP file.</li>
-				</ul>
-
-				<Text type="secondary">
-					For detailed instructions, check out{" "}
-					<a
-						href="https://slack.com/help/articles/201658943-Export-your-workspace-data"
-						target="_blank"
-						rel="noopener noreferrer"
-						style={{ marginLeft: 4 }}
-					>
-						this Slack help article.
-					</a>
-				</Text>
+				<Text type="secondary">Only .zip files are allowed (Max: 1 file)</Text>
 
 				<Divider />
 
@@ -128,16 +98,10 @@ export const FileUploading = () => {
 					</Button>
 				</Upload>
 
-				{/* 🔽 We deliberately don't disable this button for accessibility reasons🔽 */}
 				<Button
 					type="primary"
-					onClick={() => {
-						if (fileList.length === 0) {
-							message.error("Please select a ZIP file before uploading.");
-							return;
-						}
-						handleUpload();
-					}}
+					onClick={handleUpload}
+					disabled={fileList.length === 0}
 					loading={uploading}
 					style={{ width: "100%", marginTop: 12 }}
 				>
