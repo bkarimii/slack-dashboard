@@ -9,23 +9,32 @@ export const FileUploading = () => {
 	const [uploading, setUploading] = useState(false);
 
 	const handleUpload = () => {
+		if (fileList.length === 0) {
+			message.warning("Please select a file before uploading.");
+			return;
+		}
+
 		const formData = new FormData();
 		fileList.forEach((file) => {
 			formData.append("file", file);
 		});
+
 		setUploading(true);
 
 		fetch("https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload", {
 			method: "POST",
 			body: formData,
 		})
-			.then((res) => res.json())
+			.then((res) => {
+				if (!res.ok) throw new Error("Upload failed. Please try again.");
+				return res.json();
+			})
 			.then(() => {
-				setFileList([]);
+				setFileList([]); // Clear the file list after successful upload
 				message.success("Upload successful.");
 			})
-			.catch(() => {
-				message.error("Upload failed.");
+			.catch((error) => {
+				message.error(error.message || "Upload failed.");
 			})
 			.finally(() => {
 				setUploading(false);
