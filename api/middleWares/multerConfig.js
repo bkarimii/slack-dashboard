@@ -20,4 +20,26 @@ const upload = multer({
 	limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
 }).single("file");
 
-export default upload;
+export const slackUploadMiddleware = (req, res, next) => {
+	upload(req, res, (err) => {
+		if (err) {
+			return res
+				.status(400)
+				.json({ success: false, message: `File upload error: ${err.message}` });
+		}
+
+		if (!req.file) {
+			return res
+				.status(404)
+				.json({ success: false, message: "File not found" });
+		}
+
+		if (req.file.mimetype !== "application/zip") {
+			return res
+				.status(400)
+				.json({ success: false, message: "File must be a ZIP type" });
+		}
+
+		next();
+	});
+};
