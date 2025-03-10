@@ -15,6 +15,7 @@ const migration = {
 			user_id: { type: "text", unique: true, notNull: true },
 			display_name: { type: "text", notNull: true },
 			display_name_normalised: { type: "text", notNull: true },
+			is_admin: { type: "boolean", notNull: true },
 			email: { type: "text", unique: true, notNull: true },
 		});
 	},
