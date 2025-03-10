@@ -4,7 +4,8 @@ import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import { updateCounts } from "./functions/updateCounts.js";
 import messageRouter from "./messages/messageRouter.js";
-import upload from "./middleWares/multerConfig.js";
+import { slackUploadMiddleware } from "./middleWares/multerConfig.js";
+import { zipExtractor } from "./middleWares/zipExtractor.js";
 
 const api = Router();
 
@@ -70,33 +71,19 @@ api.get("/fetch-users", async (req, res) => {
 	}
 });
 
-api.post("/upload", async (req, res) => {
-	upload(req, res, (err) => {
-		if (err) {
-			return res
-				.status(400)
-				.json({ success: false, message: `File upload error: ${err.message}` });
-		}
+api.post("/upload", slackUploadMiddleware, async (req, res) => {
+	try {
+		const slackZipBuffer = req.file.buffer;
+		const extractedDir = zipExtractor(slackZipBuffer);
+		// eslint-disable-next-line no-unused-vars
+		const usersActivityAnalysis = updateCounts(extractedDir);
 
-		if (!req.file) {
-			res.status(404).json({ success: false, message: "file not fund" });
-		}
+		// @todo insert userActivity into database
 
-		if (req.file.mimetype !== "application/zip") {
-			res
-				.status(400)
-				.json({ success: false, message: "file must be a zip type" });
-		}
-
-		try {
-			const zipBuffer = req.file.buffer;
-			const data = updateCounts(zipBuffer);
-
-			res.status(200).json({ success: true, data: data });
-		} catch (error) {
-			res.status(500).json({ message: "internal server error", err: error });
-		}
-	});
+		res.status(200).json({ success: true });
+	} catch (error) {
+		res.status(500).json({ message: "internal server error" });
+	}
 });
 
 export default api;
