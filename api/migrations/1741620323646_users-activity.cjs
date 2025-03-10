@@ -9,9 +9,26 @@
  * }}
  */
 const migration = {
-	up(pgm) {},
-	down(pgm) {},
-	shorthands: undefined,
+	up(pgm) {
+		pgm.createTable("slack_user_activity", {
+			id: { type: "serial", primaryKey: true },
+			channel: { type: "text", notNull: true },
+			date: { type: "date", notNull: true },
+			user_id: {
+				type: "text",
+				notNull: true,
+				references: "all_users(user_id)",
+				onDelete: "CASCADE",
+			},
+			messages: { type: "integer", default: 0, notNull: true },
+			reactions: { type: "integer", default: 0, notNull: true },
+			reactions_received: { type: "integer", default: 0, notNull: true },
+		});
+	},
+
+	down(pgm) {
+		pgm.dropTable("slack_user_activity");
+	},
 };
 
 module.exports = migration;
