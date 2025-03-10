@@ -1,5 +1,3 @@
-import { zipExtractor } from "../middleWares/zipExtractor.js";
-
 import { refineContent } from "./refineContent.js";
 
 /**
@@ -7,11 +5,9 @@ import { refineContent } from "./refineContent.js";
  * @param {Object} zipBuffer - files buffer object
  * @returns {Object} The updated counts object
  */
-function updateCounts(zipBuffer) {
+export const updateCounts = (extractedDir) => {
 	// Use zipExtractor to extract the zip file in memory
 	try {
-		const extractedDir = zipExtractor(zipBuffer);
-
 		const channelFiles = {};
 
 		const channels = extractedDir
@@ -62,6 +58,4 @@ function updateCounts(zipBuffer) {
 	} catch (error) {
 		return [];
 	}
-}
-
-export { updateCounts };
+};
