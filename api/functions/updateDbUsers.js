@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 export const updateDbUsers = async (usersFile, db) => {
 	try {
 		await db.query("BEGIN");
