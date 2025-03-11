@@ -21,7 +21,7 @@ export const FileUploading = () => {
 
 		setUploading(true);
 
-		fetch("https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload", {
+		fetch("http://localhost:3000/api/upload/api/upload", {
 			method: "POST",
 			body: formData,
 		})
