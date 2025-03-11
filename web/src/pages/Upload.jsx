@@ -82,7 +82,6 @@ export const FileUploading = () => {
 			>
 				<CloudUploadOutlined style={{ fontSize: "50px", color: "#1890ff" }} />
 
-				{/* 🔽 Updated Title + Instructions 🔽 */}
 				<Title level={3} style={{ marginTop: 16 }}>
 					Upload Your Slack Export ZIP File
 				</Title>
@@ -117,7 +116,6 @@ export const FileUploading = () => {
 						this Slack help article.
 					</a>
 				</Text>
-				{/* 🔼 End of Updated Instructions 🔼 */}
 
 				<Divider />
 
@@ -130,7 +128,7 @@ export const FileUploading = () => {
 					</Button>
 				</Upload>
 
-				{/* 🔽 Updated Button (Now Always Enabled) 🔽 */}
+				{/* 🔽 We deliberately don't disable this button for accessibility reasons🔽 */}
 				<Button
 					type="primary"
 					onClick={() => {
@@ -145,7 +143,6 @@ export const FileUploading = () => {
 				>
 					{uploading ? "Uploading..." : "Start Upload"}
 				</Button>
-				{/* 🔼 End of Button Update 🔼 */}
 			</Card>
 		</div>
 	);
