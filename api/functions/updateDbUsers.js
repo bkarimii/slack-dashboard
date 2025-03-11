@@ -6,8 +6,6 @@ export const updateDbUsers = async (usersFile, db) => {
 
 		await db.query("BEGIN");
 
-		await db.query("DELETE FROM all_users");
-
 		const activeUsers = usersFile.filter((user) => !user.deleted);
 
 		if (activeUsers.length === 0) {
