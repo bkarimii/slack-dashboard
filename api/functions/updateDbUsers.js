@@ -1,7 +1,7 @@
 export const updateDbUsers = async (usersFile, db) => {
 	try {
 		if (!usersFile) {
-			return { success: false };
+			return { success: false, message: "invalid uploaded users" };
 		}
 
 		await db.query("BEGIN");
