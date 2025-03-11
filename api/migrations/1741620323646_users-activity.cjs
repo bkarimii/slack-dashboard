@@ -10,18 +10,24 @@
  */
 const migration = {
 	up(pgm) {
-		pgm.createTable("all_users", {
+		pgm.createTable("slack_user_activity", {
 			id: { type: "serial", primaryKey: true },
-			user_id: { type: "text", unique: true, notNull: true },
-			display_name: { type: "text", notNull: true },
-			display_name_normalised: { type: "text", notNull: true },
-			is_admin: { type: "boolean", notNull: true },
-			email: { type: "text", unique: true, notNull: true },
+			channel: { type: "text", notNull: true },
+			date: { type: "date", notNull: true },
+			user_id: {
+				type: "text",
+				notNull: true,
+				references: "all_users(user_id)",
+				onDelete: "CASCADE",
+			},
+			messages: { type: "integer", default: 0, notNull: true },
+			reactions: { type: "integer", default: 0, notNull: true },
+			reactions_received: { type: "integer", default: 0, notNull: true },
 		});
 	},
 
 	down(pgm) {
-		pgm.dropTable("all_users");
+		pgm.dropTable("slack_user_activity");
 	},
 };
 
