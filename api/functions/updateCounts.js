@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { refineContent } from "./refineContent.js";
 
 /**
@@ -6,6 +5,7 @@ import { refineContent } from "./refineContent.js";
  * @param {Object} zipBuffer - files buffer object
  * @returns {Object} The updated counts object
  */
+
 export const updateCounts = (extractedDir) => {
 	// Use zipExtractor to extract the zip file in memory
 	try {
