@@ -8,45 +8,56 @@
  * @returns {Object} An object with each user's message count, reaction count, and reactions received.
  */
 
-function refineContent(jsonArray) {
-	const refined = {};
+export const refineContent = (jsonArray) => {
+	const activityCounter = {};
 
-	jsonArray.forEach((message) => {
-		const { user, reactions } = message;
+	if (!jsonArray || !Array.isArray(jsonArray)) {
+		return {};
+	}
 
-		if (!refined[user]) {
-			refined[user] = {
-				messageCount: 0,
-				reactionCount: 0,
-				reactionsReceived: 0, // To count how many reactions the user received
-			};
-		}
+	try {
+		jsonArray.forEach((eachMessage) => {
+			if (!eachMessage || typeof eachMessage !== "object") {
+				return; // Skip this iteration
+			}
 
-		refined[user].messageCount++;
+			const user = eachMessage.user;
+			const reactions = eachMessage.reactions;
 
-		if (Array.isArray(reactions) && reactions.length > 0) {
-			reactions.forEach((reaction) => {
-				// Count how many reactions this user received for this message
-				if (reaction.users.includes(user)) {
-					refined[user].reactionCount++;
-				}
+			if (!activityCounter[user]) {
+				activityCounter[user] = {
+					postedMessage: 0,
+					givenReactions: 0,
+					receivedReactions: 0,
+				};
+			}
 
-				// Count how many reactions the user gave across all messages
-				reaction.users.forEach((reactingUser) => {
-					if (reactingUser === user) {
-						refined[user].reactionCount++;
-					} else {
-						refined[reactingUser] = refined[reactingUser] || {
-							reactionCount: 0,
-						};
-						refined[reactingUser].reactionsReceived++;
+			activityCounter[user].postedMessage++;
+			if (Array.isArray(reactions) && reactions.length > 0) {
+				reactions.forEach((eachReaction) => {
+					if (!eachReaction || !Array.isArray(eachReaction.users)) {
+						return;
 					}
+					eachReaction.users.forEach((reactingUser) => {
+						if (!activityCounter[reactingUser]) {
+							activityCounter[reactingUser] = {
+								postedMessage: 0,
+								givenReactions: 0,
+								receivedReactions: 0,
+							};
+						}
+						// skip self-reactions
+						if (reactingUser !== user) {
+							activityCounter[reactingUser].givenReactions++;
+							activityCounter[user].receivedReactions++;
+						}
+					});
 				});
-			});
-		}
-	});
+			}
+		});
+	} catch (error) {
+		return {};
+	}
 
-	return refined;
-}
-
-export { refineContent };
+	return activityCounter;
+};
