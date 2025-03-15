@@ -9,7 +9,7 @@ import { refineContent } from "./refineContent.js";
 export const updateCounts = (extractedDir) => {
 	// Use zipExtractor to extract the zip file in memory
 	try {
-		const channelFiles = {};
+		const userActivityPerDay = {};
 
 		const channels = extractedDir
 			.filter((entry) => entry.isDirectory)
@@ -27,13 +27,13 @@ export const updateCounts = (extractedDir) => {
 				const fileContent = JSON.parse(entry.content);
 				const refined = refineContent(fileContent);
 
-				if (!channelFiles[fileDate]) {
-					channelFiles[fileDate] = {};
+				if (!userActivityPerDay[fileDate]) {
+					userActivityPerDay[fileDate] = {};
 				}
 
 				for (const user in refined) {
-					if (!channelFiles[fileDate][user]) {
-						channelFiles[fileDate][user] = {
+					if (!userActivityPerDay[fileDate][user]) {
+						userActivityPerDay[fileDate][user] = {
 							messages: 0,
 							reactions: 0,
 							reactionsReceived: 0,
@@ -41,15 +41,17 @@ export const updateCounts = (extractedDir) => {
 					}
 
 					// Aggregate messages and reactions for each user on the specific date
-					channelFiles[fileDate][user].messages += refined[user].messageCount;
-					channelFiles[fileDate][user].reactions += refined[user].reactionCount;
-					channelFiles[fileDate][user].reactionsReceived +=
+					userActivityPerDay[fileDate][user].messages +=
+						refined[user].messageCount;
+					userActivityPerDay[fileDate][user].reactions +=
+						refined[user].reactionCount;
+					userActivityPerDay[fileDate][user].reactionsReceived +=
 						refined[user].reactionsReceived;
 				}
 			});
 		});
 
-		return channelFiles;
+		return userActivityPerDay;
 	} catch (error) {
 		return [];
 	}
