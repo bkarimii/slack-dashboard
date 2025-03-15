@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { refineContent } from "./refineContent.js";
 
 /**
@@ -21,22 +22,18 @@ export const updateCounts = (extractedDir) => {
 					entry.name.startsWith(channel) && entry.name.endsWith(".json"),
 			);
 
-			if (!channelFiles[channel]) {
-				channelFiles[channel] = {};
-			}
-
 			channelContent.forEach((entry) => {
 				const fileDate = entry.name.split("/").pop().split(".json")[0];
 				const fileContent = JSON.parse(entry.content);
 				const refined = refineContent(fileContent);
 
-				if (!channelFiles[channel][fileDate]) {
-					channelFiles[channel][fileDate] = {};
+				if (!channelFiles[fileDate]) {
+					channelFiles[fileDate] = {};
 				}
 
 				for (const user in refined) {
-					if (!channelFiles[channel][fileDate][user]) {
-						channelFiles[channel][fileDate][user] = {
+					if (!channelFiles[fileDate][user]) {
+						channelFiles[fileDate][user] = {
 							messages: 0,
 							reactions: 0,
 							reactionsReceived: 0,
@@ -44,11 +41,9 @@ export const updateCounts = (extractedDir) => {
 					}
 
 					// Aggregate messages and reactions for each user on the specific date
-					channelFiles[channel][fileDate][user].messages +=
-						refined[user].messageCount;
-					channelFiles[channel][fileDate][user].reactions +=
-						refined[user].reactionCount;
-					channelFiles[channel][fileDate][user].reactionsReceived +=
+					channelFiles[fileDate][user].messages += refined[user].messageCount;
+					channelFiles[fileDate][user].reactions += refined[user].reactionCount;
+					channelFiles[fileDate][user].reactionsReceived +=
 						refined[user].reactionsReceived;
 				}
 			});
