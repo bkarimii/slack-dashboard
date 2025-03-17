@@ -27,7 +27,6 @@ export const processImportFiles = (extractedDir) => {
 			channelContent.forEach((entry) => {
 				const fileDate = entry.name.split("/").pop().split(".json")[0];
 				const fileContent = JSON.parse(entry.content);
-				// console.log(fileContent,"<---This is file content")
 				const refined = updateCounts(fileContent);
 
 				if (!userActivityPerDay[fileDate]) {
