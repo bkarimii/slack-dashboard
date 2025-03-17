@@ -1,12 +1,47 @@
-export const updateDbUsers = async (usersFile, db) => {
+/**
+ * Updates the users in the database by processing the users.json file from the extracted directory.
+ * Filters out invalid users, and performs a batch upsert into the 'all_users' table.
+ *
+ * @param {Array} extractedDir - An array of directory entries (files and folders) extracted from a zip.
+ * @param {Object} db - The database client used to interact with the database.
+ * @returns {Object} - Returns an object indicating success or failure with a message.
+ */
+export const updateDbUsers = async (extractedDir, db) => {
 	try {
-		if (!usersFile) {
-			return { success: false, message: "invalid uploaded users" };
+		// if directory passed is invalid
+		if (!extractedDir) {
+			return { success: false, message: "invalid passed directory" };
 		}
 
-		await db.query("BEGIN");
+		// Find users.json file in the directory
+		const usersFileEntry = extractedDir.find(
+			(entry) => entry.name === "users.json" && entry.isFile,
+		);
 
-		const activeUsers = usersFile.filter(
+		if (!usersFileEntry) {
+			return {
+				success: false,
+				message: "users json file not found in the directory",
+			};
+		}
+
+		const usersFileContent = usersFileEntry.content;
+
+		if (!usersFileContent) {
+			return {
+				success: false,
+				message: "users.json content is missing or invalid",
+			};
+		}
+
+		let usersList;
+		try {
+			usersList = JSON.parse(usersFileContent);
+		} catch (error) {
+			return { success: false, message: "Error parsing users.json" };
+		}
+
+		const activeUsers = usersList.filter(
 			(user) =>
 				!user.deleted &&
 				user.id &&
@@ -23,6 +58,8 @@ export const updateDbUsers = async (usersFile, db) => {
 				message: "active user is empty.something is wrong",
 			};
 		}
+
+		await db.query("BEGIN");
 
 		// Batch upsert query
 		const insertQuery = `
