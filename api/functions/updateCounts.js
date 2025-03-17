@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../utils/logger.js";
 
 /**
  * Processes messages to count how many messages, reactions, and reactions received each user has.
