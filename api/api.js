@@ -2,10 +2,10 @@ import { Router } from "express";
 
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
-import { updateCounts } from "./functions/updateCounts.js";
+import { processImportFiles } from "./functions/processImportFiles.js";
 import messageRouter from "./messages/messageRouter.js";
-import { slackUploadMiddleware } from "./middleWares/multerConfig.js";
-import { zipExtractor } from "./middleWares/zipExtractor.js";
+import { processUpload } from "./middlewares/processUpload.js";
+import { zipExtractor } from "./middlewares/zipExtractor.js";
 
 const api = Router();
 
@@ -71,12 +71,12 @@ api.get("/fetch-users", async (req, res) => {
 	}
 });
 
-api.post("/upload", slackUploadMiddleware, async (req, res) => {
+api.post("/upload", processUpload, async (req, res) => {
 	try {
 		const slackZipBuffer = req.file.buffer;
 		const extractedDir = zipExtractor(slackZipBuffer);
 		// eslint-disable-next-line no-unused-vars
-		const usersActivityAnalysis = updateCounts(extractedDir);
+		const usersActivityAnalysis = processImportFiles(extractedDir);
 
 		// @todo insert userActivity into database
 
