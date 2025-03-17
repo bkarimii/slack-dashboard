@@ -52,7 +52,6 @@ export const updateDbUsers = async (extractedDir, db) => {
 		);
 
 		if (activeUsers.length === 0) {
-			await db.query("ROLLBACK");
 			return {
 				success: false,
 				message: "active user is empty.something is wrong",
