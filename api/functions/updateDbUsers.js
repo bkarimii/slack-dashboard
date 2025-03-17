@@ -6,7 +6,15 @@ export const updateDbUsers = async (usersFile, db) => {
 
 		await db.query("BEGIN");
 
-		const activeUsers = usersFile.filter((user) => !user.deleted);
+		const activeUsers = usersFile.filter(
+			(user) =>
+				!user.deleted &&
+				user.id &&
+				user.display_name &&
+				user.display_name_normalized &&
+				user.email &&
+				user.is_admin !== undefined,
+		);
 
 		if (activeUsers.length === 0) {
 			await db.query("ROLLBACK");
@@ -29,11 +37,11 @@ export const updateDbUsers = async (usersFile, db) => {
         `;
 
 		const queryValues = activeUsers.flatMap((user) => [
-			user.id ?? "unkown",
-			user.profile.display_name ?? "",
-			user.profile.display_name_normalized ?? "",
+			user.id,
+			user.profile.display_name,
+			user.profile.display_name_normalized,
 			user.is_admin ?? false,
-			user.profile.email ?? "",
+			user.profile.email,
 		]);
 
 		// Insert all users in a single query
