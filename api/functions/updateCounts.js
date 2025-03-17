@@ -1,3 +1,5 @@
+import logger from "../utils/logger";
+
 /**
  * Processes messages to count how many messages, reactions, and reactions received each user has.
  *
@@ -7,9 +9,6 @@
  *
  * @returns {Object} An object with each user's message count, reaction count, and reactions received.
  */
-
-import logger from "../utils/logger";
-
 export const updateCounts = (messages) => {
 	const activity = {};
 
