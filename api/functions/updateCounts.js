@@ -8,6 +8,8 @@
  * @returns {Object} An object with each user's message count, reaction count, and reactions received.
  */
 
+import logger from "../utils/logger";
+
 export const updateCounts = (messages) => {
 	const activity = {};
 
@@ -56,6 +58,7 @@ export const updateCounts = (messages) => {
 			}
 		});
 	} catch (error) {
+		logger.debug("Error i update count function: ", error);
 		return {};
 	}
 
