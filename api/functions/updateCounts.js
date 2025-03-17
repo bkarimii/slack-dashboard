@@ -1,58 +1,63 @@
-import { refineContent } from "./refineContent.js";
-
 /**
- * Updates the counts object with the messages and reactions from the slack data
- * @param {Object} zipBuffer - files buffer object
- * @returns {Object} The updated counts object
+ * Processes messages to count how many messages, reactions, and reactions received each user has.
+ *
+ * @param {Array} messages - An array of message objects. Each message includes:
+ *   - `user`: The user who sent the message.
+ *   - `reactions`: An array of users who reacted to the message.
+ *
+ * @returns {Object} An object with each user's message count, reaction count, and reactions received.
  */
 
-export const updateCounts = (extractedDir) => {
-	// Use zipExtractor to extract the zip file in memory
-	try {
-		const userActivityPerDay = {};
+export const updateCounts = (messages) => {
+	const activity = {};
 
-		const channels = extractedDir
-			.filter((entry) => entry.isDirectory)
-			.map((entry) => entry.name);
-
-		channels.forEach((channel) => {
-			// Filter the files that belong to this channel
-			const channelContent = extractedDir.filter(
-				(entry) =>
-					entry.name.startsWith(channel) && entry.name.endsWith(".json"),
-			);
-
-			channelContent.forEach((entry) => {
-				const fileDate = entry.name.split("/").pop().split(".json")[0];
-				const fileContent = JSON.parse(entry.content);
-				const refined = refineContent(fileContent);
-
-				if (!userActivityPerDay[fileDate]) {
-					userActivityPerDay[fileDate] = {};
-				}
-
-				for (const user in refined) {
-					if (!userActivityPerDay[fileDate][user]) {
-						userActivityPerDay[fileDate][user] = {
-							messages: 0,
-							reactions: 0,
-							reactionsReceived: 0,
-						};
-					}
-
-					// Aggregate messages and reactions for each user on the specific date
-					userActivityPerDay[fileDate][user].messages +=
-						refined[user].messageCount;
-					userActivityPerDay[fileDate][user].reactions +=
-						refined[user].reactionCount;
-					userActivityPerDay[fileDate][user].reactionsReceived +=
-						refined[user].reactionsReceived;
-				}
-			});
-		});
-
-		return userActivityPerDay;
-	} catch (error) {
-		return [];
+	if (!messages || !Array.isArray(messages)) {
+		return {};
 	}
+
+	try {
+		messages.forEach((message) => {
+			if (!message || typeof message !== "object") {
+				return; // Skip this iteration
+			}
+
+			const user = message.user;
+			const reactions = message.reactions;
+
+			if (!activity[user]) {
+				activity[user] = {
+					messages: 0,
+					reactions: 0,
+					reactionsReceived: 0,
+				};
+			}
+
+			activity[user].messages++;
+			if (Array.isArray(reactions) && reactions.length > 0) {
+				reactions.forEach((eachReaction) => {
+					if (!eachReaction || !Array.isArray(eachReaction.users)) {
+						return;
+					}
+					eachReaction.users.forEach((reactingUser) => {
+						if (!activity[reactingUser]) {
+							activity[reactingUser] = {
+								messages: 0,
+								reactions: 0,
+								reactionsReceived: 0,
+							};
+						}
+						// skip self-reactions
+						if (reactingUser !== user) {
+							activity[reactingUser].reactions++;
+							activity[user].reactionsReceived++;
+						}
+					});
+				});
+			}
+		});
+	} catch (error) {
+		return {};
+	}
+
+	return activity;
 };
