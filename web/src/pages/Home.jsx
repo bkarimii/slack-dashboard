@@ -1,7 +1,7 @@
 function App() {
 	return (
 		<>
-			<h1>CYF Slack Dashboard</h1>
+			<h1>CYF Slack Dashboard - PR DEPLOYMENT</h1>
 		</>
 	);
 }
