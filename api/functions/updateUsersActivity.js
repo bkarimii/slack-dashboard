@@ -23,30 +23,38 @@ import logger from "../utils/logger.js";
 export const updateUsersActivity = async (processedActivity, db) => {
 	try {
 		if (!processedActivity || Object.keys(processedActivity).length === 0) {
-			return { success: false, message: "Invalid or empty activity data" };
+			logger.error("invalid or empty activity data");
+			return { success: false, message: "invalid or empty activity data" };
 		}
 
 		await db.query("BEGIN");
 
-		const entries = [];
+		const usersActivity = [];
 
 		for (const date in processedActivity) {
 			const usersActivityPerDate = processedActivity[date];
 
 			for (const userId in usersActivityPerDate) {
 				const { messages, reactions, reactionsReceived } = date[userId];
-				entries.push([date, userId, messages, reactions, reactionsReceived]);
+				usersActivity.push([
+					date,
+					userId,
+					messages,
+					reactions,
+					reactionsReceived,
+				]);
 			}
 		}
 
-		if (entries.length === 0) {
-			db.query("ROLLBACK");
-			return { success: false, message: "no valid data to insert" };
+		if (usersActivity.length === 0) {
+			db.query("COMMIT");
+			logger.warn("no user activity was found to be instrted.");
+			return { success: true };
 		}
 
 		const insertQuery = `
             INSERT INTO slack_user_activity (date, user_id, messages, reactions, reactions_received)
-            VALUES ${entries
+            VALUES ${usersActivity
 							.map(
 								(_, i) =>
 									`($${i * 5 + 1}, $${i * 5 + 2}, $${i * 5 + 3}, $${i * 5 + 4}, $${i * 5 + 5})`,
@@ -59,7 +67,7 @@ export const updateUsersActivity = async (processedActivity, db) => {
                 reactions_received = EXCLUDED.reactions_received
         `;
 
-		const queryValues = entries.flat();
+		const queryValues = usersActivity.flat();
 
 		await db.query(insertQuery, queryValues);
 
