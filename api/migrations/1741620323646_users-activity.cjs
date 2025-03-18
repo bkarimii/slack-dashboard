@@ -23,6 +23,12 @@ const migration = {
 			reactions: { type: "integer", default: 0, notNull: true },
 			reactions_received: { type: "integer", default: 0, notNull: true },
 		});
+
+		pgm.addConstraint(
+			"slack_user_activity",
+			"unique_date_user",
+			"UNIQUE (date, user_id)",
+		);
 	},
 
 	down(pgm) {
