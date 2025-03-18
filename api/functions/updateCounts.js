@@ -17,42 +17,43 @@ export const updateCounts = (messages) => {
 	}
 
 	try {
-		messages.filter(msg => msg && typeof msg === "object").forEach((message) => {
+		messages
+			.filter((msg) => msg && typeof msg === "object")
+			.forEach((message) => {
+				const user = message.user;
+				const reactions = message.reactions;
 
-			const user = message.user;
-			const reactions = message.reactions;
+				if (!activity[user]) {
+					activity[user] = {
+						messages: 0,
+						reactions: 0,
+						reactionsReceived: 0,
+					};
+				}
 
-			if (!activity[user]) {
-				activity[user] = {
-					messages: 0,
-					reactions: 0,
-					reactionsReceived: 0,
-				};
-			}
-
-			activity[user].messages++;
-			if (Array.isArray(reactions) && reactions.length > 0) {
-				reactions.forEach((eachReaction) => {
-					if (!eachReaction || !Array.isArray(eachReaction.users)) {
-						return;
-					}
-					eachReaction.users.forEach((reactingUser) => {
-						if (!activity[reactingUser]) {
-							activity[reactingUser] = {
-								messages: 0,
-								reactions: 0,
-								reactionsReceived: 0,
-							};
+				activity[user].messages++;
+				if (Array.isArray(reactions) && reactions.length > 0) {
+					reactions.forEach((eachReaction) => {
+						if (!eachReaction || !Array.isArray(eachReaction.users)) {
+							return;
 						}
-						// skip self-reactions
-						if (reactingUser !== user) {
-							activity[reactingUser].reactions++;
-							activity[user].reactionsReceived++;
-						}
+						eachReaction.users.forEach((reactingUser) => {
+							if (!activity[reactingUser]) {
+								activity[reactingUser] = {
+									messages: 0,
+									reactions: 0,
+									reactionsReceived: 0,
+								};
+							}
+							// skip self-reactions
+							if (reactingUser !== user) {
+								activity[reactingUser].reactions++;
+								activity[user].reactionsReceived++;
+							}
+						});
 					});
-				});
-			}
-		});
+				}
+			});
 	} catch (error) {
 		logger.error("Error in updateCounts function: ", error);
 		return {};
