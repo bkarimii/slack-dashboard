@@ -16,9 +16,9 @@ export const updateDbUsers = async (extractedDir, db) => {
 		}
 
 		// Find users.json file in the directory
-		const usersFileEntry = extractedDir.find(
-			(entry) => entry.name === "users.json" && entry.isFile,
-		);
+		const usersFileEntry = extractedDir.find((entry) => {
+			return entry.name === "users.json";
+		});
 
 		if (!usersFileEntry) {
 			logger.error("users json file not found in the directory");
@@ -49,9 +49,9 @@ export const updateDbUsers = async (extractedDir, db) => {
 			(user) =>
 				!user.deleted &&
 				user.id &&
-				user.display_name &&
-				user.display_name_normalized &&
-				user.email &&
+				user.profile.display_name &&
+				user.profile.display_name_normalized &&
+				user.profile.email &&
 				user.is_admin !== undefined,
 		);
 
