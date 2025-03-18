@@ -54,7 +54,7 @@ export const processImportFiles = (extractedDir) => {
 
 		return userActivityPerDay;
 	} catch (error) {
-		logger.debug(error);
+		logger.error(error);
 		return {};
 	}
 };
