@@ -17,10 +17,7 @@ export const updateCounts = (messages) => {
 	}
 
 	try {
-		messages.forEach((message) => {
-			if (!message || typeof message !== "object") {
-				return; // Skip this iteration
-			}
+		messages.filter(msg => msg && typeof msg === "object").forEach((message) => {
 
 			const user = message.user;
 			const reactions = message.reactions;
