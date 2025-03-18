@@ -1,3 +1,5 @@
+import logger from "../utils/logger.js";
+
 /**
  * Updates the users in the database by processing the users.json file from the extracted directory.
  * Filters out invalid users, and performs a batch upsert into the 'all_users' table.
@@ -19,6 +21,7 @@ export const updateDbUsers = async (extractedDir, db) => {
 		);
 
 		if (!usersFileEntry) {
+			logger.error("users json file not found in the directory");
 			return {
 				success: false,
 				message: "users json file not found in the directory",
@@ -38,7 +41,8 @@ export const updateDbUsers = async (extractedDir, db) => {
 		try {
 			usersList = JSON.parse(usersFileContent);
 		} catch (error) {
-			return { success: false, message: "Error parsing users.json" };
+			logger.error("Error parsing users.json");
+			return { success: false, message: "Error in parsing users.json" };
 		}
 
 		const activeUsers = usersList.filter(
@@ -52,6 +56,7 @@ export const updateDbUsers = async (extractedDir, db) => {
 		);
 
 		if (activeUsers.length === 0) {
+			logger.error("active user is empty.something is wrong");
 			return {
 				success: false,
 				message: "active user is empty.something is wrong",
@@ -85,9 +90,11 @@ export const updateDbUsers = async (extractedDir, db) => {
 
 		await db.query("COMMIT");
 
+		logger.info("users inserted into database successfully");
 		return { success: true };
 	} catch (error) {
 		await db.query("ROLLBACK");
+		logger.error(error);
 		return { success: false };
 	}
 };
