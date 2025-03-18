@@ -27,15 +27,36 @@ export const updateUsersActivity = async (processedActivity, db) => {
 			return { success: false, message: "invalid or empty activity data" };
 		}
 
-		await db.query("BEGIN");
+		// retrieve all the users in database as they are real users
+		const realUsers = await db.query("SELECT user_id FROM all_users");
 
-		const usersActivity = [];
+		const realUserIds = new Set(realUsers.rows.map((user) => user.user_id));
 
+		const realUsersActivity = {};
+
+		// Filter bots and apps from users activity
 		for (const date in processedActivity) {
 			const usersActivityPerDate = processedActivity[date];
 
+			realUsersActivity[date] = {};
+
 			for (const userId in usersActivityPerDate) {
-				const { messages, reactions, reactionsReceived } = date[userId];
+				if (realUserIds.has(userId)) {
+					realUsersActivity[date][userId] = usersActivityPerDate[userId];
+				}
+			}
+		}
+
+		await db.query("BEGIN");
+
+		const usersActivity = [];
+		// Process the filtered activity and prepare it for insertion
+		for (const date in realUsersActivity) {
+			const usersActivityPerDate = realUsersActivity[date];
+
+			for (const userId in usersActivityPerDate) {
+				const { messages, reactions, reactionsReceived } =
+					usersActivityPerDate[userId];
 				usersActivity.push([
 					date,
 					userId,
@@ -47,7 +68,7 @@ export const updateUsersActivity = async (processedActivity, db) => {
 		}
 
 		if (usersActivity.length === 0) {
-			db.query("COMMIT");
+			await db.query("COMMIT");
 			logger.warn("no user activity was found to be instrted.");
 			return { success: true };
 		}
