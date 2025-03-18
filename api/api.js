@@ -2,7 +2,10 @@ import { Router } from "express";
 
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
+import { processImportFiles } from "./functions/processImportFiles.js";
 import messageRouter from "./messages/messageRouter.js";
+import { processUpload } from "./middlewares/processUpload.js";
+import { zipExtractor } from "./middlewares/zipExtractor.js";
 
 const api = Router();
 
@@ -65,6 +68,21 @@ api.get("/fetch-users", async (req, res) => {
 		}
 	} catch (error) {
 		res.status(500).json({ message: "Internal Server Error" });
+	}
+});
+
+api.post("/upload", processUpload, async (req, res) => {
+	try {
+		const slackZipBuffer = req.file.buffer;
+		const extractedDir = zipExtractor(slackZipBuffer);
+		// eslint-disable-next-line no-unused-vars
+		const usersActivityAnalysis = processImportFiles(extractedDir);
+
+		// @todo insert userActivity into database
+
+		res.status(200).json({ success: true });
+	} catch (error) {
+		res.status(500).json({ message: "internal server error" });
 	}
 });
 

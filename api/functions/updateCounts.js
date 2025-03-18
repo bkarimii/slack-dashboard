@@ -1,32 +1,63 @@
 import logger from "../utils/logger.js";
 
 /**
- * Updates the counts object with the messages and reactions from the slack data
- * @param {Object} counts - The counts object
- * @param {Object} slackData - The slack data
- * @returns {Object} The updated counts object
+ * Processes messages to count how many messages, reactions, and reactions received each user has.
+ *
+ * @param {Array} messages - An array of message objects. Each message includes:
+ *   - `user`: The user who sent the message.
+ *   - `reactions`: An array of users who reacted to the message.
+ *
+ * @returns {Object} An object with each user's message count, reaction count, and reactions received.
  */
-export const updateCounts = ({ counts, slackData }) => {
-	logger.debug(counts, slackData);
-	// @todo Implement this function
-	return {
-		"01-02-2025": {
-			U1234: {
-				messages: 12,
-				reactions: 22,
-			},
-			U5678: {
-				messages: 3,
-			},
-		},
-		"02-02-2025": {
-			U1234: {
-				messages: 33,
-				reactions: 45,
-			},
-			U5678: {
-				reactions: 11,
-			},
-		},
-	};
+export const updateCounts = (messages) => {
+	const activity = {};
+
+	if (!messages || !Array.isArray(messages)) {
+		return {};
+	}
+
+	try {
+		messages
+			.filter((msg) => msg && typeof msg === "object")
+			.forEach((message) => {
+				const user = message.user;
+				const reactions = message.reactions;
+
+				if (!activity[user]) {
+					activity[user] = {
+						messages: 0,
+						reactions: 0,
+						reactionsReceived: 0,
+					};
+				}
+
+				activity[user].messages++;
+				if (Array.isArray(reactions) && reactions.length > 0) {
+					reactions.forEach((eachReaction) => {
+						if (!eachReaction || !Array.isArray(eachReaction.users)) {
+							return;
+						}
+						eachReaction.users.forEach((reactingUser) => {
+							if (!activity[reactingUser]) {
+								activity[reactingUser] = {
+									messages: 0,
+									reactions: 0,
+									reactionsReceived: 0,
+								};
+							}
+							// skip self-reactions
+							if (reactingUser !== user) {
+								activity[reactingUser].reactions++;
+								activity[user].reactionsReceived++;
+							}
+						});
+					});
+				}
+			});
+	} catch (error) {
+		logger.error("Error in updateCounts function: ", error);
+		return {};
+	}
+
+	return activity;
 };
