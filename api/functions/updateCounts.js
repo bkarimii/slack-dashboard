@@ -54,7 +54,7 @@ export const updateCounts = (messages) => {
 			}
 		});
 	} catch (error) {
-		logger.debug("Error i update count function: ", error);
+		logger.error("Error in updateCounts function: ", error);
 		return {};
 	}
 
