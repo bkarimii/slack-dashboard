@@ -84,19 +84,19 @@ api.post("/upload", processUpload, async (req, res) => {
 		const isUsersInserted = await updateDbUsers(extractedDir, db);
 
 		if (!isUsersInserted.success) {
-			res.status(500).json();
+			return res.status(500).json({});
 		}
 
 		const isActivityInserted = await updateUsersActivity(processedActivity, db);
 
-		if (!isActivityInserted) {
-			res.status(500).json();
+		if (!isActivityInserted.success) {
+			return res.status(500).json({});
 		}
 
-		res.status(200).json();
+		return res.status(200).json({});
 	} catch (error) {
 		logger.error(error);
-		res.status(500).json();
+		return res.status(500).json({});
 	}
 });
 
