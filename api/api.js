@@ -8,6 +8,7 @@ import { updateUsersActivity } from "./functions/updateUsersActivity.js";
 import messageRouter from "./messages/messageRouter.js";
 import { processUpload } from "./middlewares/processUpload.js";
 import { zipExtractor } from "./middlewares/zipExtractor.js";
+import logger from "./utils/logger.js";
 
 const api = Router();
 
@@ -94,6 +95,7 @@ api.post("/upload", processUpload, async (req, res) => {
 
 		res.status(200).json();
 	} catch (error) {
+		logger.error(error);
 		res.status(500).json();
 	}
 });
