@@ -1,12 +1,56 @@
-import { Router } from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+const { Router } = express;
 
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import messageRouter from "./messages/messageRouter.js";
+const fetch = (...args) =>
+	import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
+dotenv.config();
 const api = Router();
+const app = express();
+
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+		credentials: true,
+	}),
+);
+app.use(bodyParser.json());
 
 api.use("/message", messageRouter);
+
+api.get("/getUserData", async (req, res) => {
+	const authHeader = req.get("Authorization");
+	if (!authHeader) {
+		return res.status(401).json({ error: "Authorization token missing" });
+	}
+
+	try {
+		const response = await fetch("https://api.github.com/user", {
+			method: "GET",
+			headers: {
+				Authorization: authHeader,
+			},
+		});
+
+		const data = await response.json();
+
+		if (response.ok) {
+			res.json(data);
+		} else {
+			res
+				.status(500)
+				.json({ error: data.message || "Failed to fetch user data" });
+		}
+	} catch (error) {
+		res.status(500).json({ error });
+	}
+});
 
 api.post("/subscribe", async (req, res) => {
 	const email = req.body.email;

@@ -7,6 +7,7 @@ import { ConfirmationPage } from "./pages/ConfirmationPage.jsx";
 import { ErrorOnSubscribe } from "./pages/ErrorOnSubscribe.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
+import OAuthCallback from "./pages/OAuthCallback .jsx";
 import Subscribe from "./pages/Subscribe.jsx";
 import { FileUploading } from "./pages/Upload.jsx";
 import { theme } from "./theme.js";
@@ -22,6 +23,7 @@ function App() {
 				<Route path="/subscribe/confirmation" element={<ConfirmationPage />} />
 				<Route path="/subscribe/error" element={<ErrorOnSubscribe />} />
 				<Route path="/upload" element={<FileUploading />} />
+				<Route path="/auth-callback" element={<OAuthCallback />} />
 			</Routes>
 		</ConfigProvider>
 	);
