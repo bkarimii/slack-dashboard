@@ -3,9 +3,12 @@ import { Router } from "express";
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import { processImportFiles } from "./functions/processImportFiles.js";
+import { updateDbUsers } from "./functions/updateDbUsers.js";
+import { updateUsersActivity } from "./functions/updateUsersActivity.js";
 import messageRouter from "./messages/messageRouter.js";
 import { processUpload } from "./middlewares/processUpload.js";
 import { zipExtractor } from "./middlewares/zipExtractor.js";
+import logger from "./utils/logger.js";
 
 const api = Router();
 
@@ -75,14 +78,25 @@ api.post("/upload", processUpload, async (req, res) => {
 	try {
 		const slackZipBuffer = req.file.buffer;
 		const extractedDir = zipExtractor(slackZipBuffer);
-		// eslint-disable-next-line no-unused-vars
-		const usersActivityAnalysis = processImportFiles(extractedDir);
 
-		// @todo insert userActivity into database
+		const processedActivity = processImportFiles(extractedDir);
 
-		res.status(200).json({ success: true });
+		const isUsersInserted = await updateDbUsers(extractedDir, db);
+
+		if (!isUsersInserted.success) {
+			return res.status(500).json({});
+		}
+
+		const isActivityInserted = await updateUsersActivity(processedActivity, db);
+
+		if (!isActivityInserted.success) {
+			return res.status(500).json({});
+		}
+
+		return res.status(200).json({});
 	} catch (error) {
-		res.status(500).json({ message: "internal server error" });
+		logger.error(error);
+		return res.status(500).json({});
 	}
 });
 
