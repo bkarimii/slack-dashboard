@@ -1,7 +1,5 @@
 import logger from "../utils/logger.js";
 
-import { decideScore } from "./decideScore.js";
-
 /**
  * Calculates the score for a user based on their activity within a specified time period.
  * If no time period is provided, it calculates the score using all available data.
@@ -32,23 +30,25 @@ export const calculateScore = async (
 		if (!startDate && !endDate) {
 			// date is not applied. default query.
 			let query =
-				"select messages, reactions from slack_users_activity where user_id=$1";
+				"select messages, reactions,reactions_received  from slack_users_activity where user_id=$1";
 			const userActivities = await db.query(query, userId);
 
 			if (userActivities.rows.length === 0) {
 				logger.warn(`No activity available for user: ${userId}`);
 				return { success: false, message: "activity not found" };
 			}
-			const messages = userActivities.rows.reduce(
-				(sum, row) => sum + (row.messages || 0),
-				0,
+
+			const usersCount = userActivities.rows.reduce(
+				(acc, row) => {
+					acc.messagesCount += row.messages || 0;
+					acc.reactionsCount += row.reactions || 0;
+					acc.reactionsReceived += row.reactions_received || 0;
+					return acc;
+				},
+				{ messagesCount: 0, reactionsCount: 0, reactionsReceived: 0 },
 			);
-			const reactions = userActivities.rows.reduce(
-				(sum, row) => sum + (row.reactions || 0),
-				0,
-			);
-			const userScore = decideScore(messages, reactions);
-			return { success: true, userScore: userScore };
+
+			return { success: true, userCount: usersCount };
 		}
 
 		// If the end date is not provided, it calculates the score from the start date to the latest available date in the database.
@@ -66,16 +66,17 @@ export const calculateScore = async (
 				};
 			}
 
-			const messages = userActivities.rows.reduce(
-				(sum, row) => sum + (row.messages || 0),
-				0,
+			const usersCount = userActivities.rows.reduce(
+				(acc, row) => {
+					acc.messagesCount += row.messages || 0;
+					acc.reactionsCount += row.reactions || 0;
+					acc.reactionsReceived += row.reactions_received || 0;
+					return acc;
+				},
+				{ messagesCount: 0, reactionsCount: 0, reactionsReceived: 0 },
 			);
-			const reactions = userActivities.rows.reduce(
-				(sum, row) => sum + (row.reactions || 0),
-				0,
-			);
-			const userScore = decideScore(messages, reactions);
-			return { success: true, userScore: userScore };
+
+			return { success: true, userScore: usersCount };
 		}
 
 		// If the end date is provided, it calculates the score from the start date to the provided end date, using data up to the earliest available date in the database.
@@ -93,16 +94,17 @@ export const calculateScore = async (
 				};
 			}
 
-			const messages = userActivities.rows.reduce(
-				(sum, row) => sum + (row.messages || 0),
-				0,
+			const usersCount = userActivities.rows.reduce(
+				(acc, row) => {
+					acc.messagesCount += row.messages || 0;
+					acc.reactionsCount += row.reactions || 0;
+					acc.reactionsReceived += row.reactions_received || 0;
+					return acc;
+				},
+				{ messagesCount: 0, reactionsCount: 0, reactionsReceived: 0 },
 			);
-			const reactions = userActivities.rows.reduce(
-				(sum, row) => sum + (row.reactions || 0),
-				0,
-			);
-			const userScore = decideScore(messages, reactions);
-			return { success: true, userScore: userScore };
+
+			return { success: true, userCount: usersCount };
 		}
 
 		// Finally, if both the start and end dates are provided, it calculates the score for the specified period of time between the two dates.
@@ -122,18 +124,17 @@ export const calculateScore = async (
 			};
 		}
 
-		const messages = userActivities.rows.reduce(
-			(sum, row) => sum + (row.messages || 0),
-			0,
-		);
-		const reactions = userActivities.rows.reduce(
-			(sum, row) => sum + (row.reactions || 0),
-			0,
+		const usersCount = userActivities.rows.reduce(
+			(acc, row) => {
+				acc.messagesCount += row.messages || 0;
+				acc.reactionsCount += row.reactions || 0;
+				acc.reactionsReceived += row.reactions_received || 0;
+				return acc;
+			},
+			{ messagesCount: 0, reactionsCount: 0, reactionsReceived: 0 },
 		);
 
-		const userScore = decideScore(messages, reactions);
-
-		return { success: true, userScore: userScore };
+		return { success: true, usersCount: usersCount };
 	} catch (error) {
 		logger.error(error);
 		return false;
