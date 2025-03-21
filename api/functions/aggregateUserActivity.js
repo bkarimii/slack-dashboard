@@ -17,7 +17,7 @@ import logger from "../utils/logger.js";
  *   - userScore (number|null): The calculated score based on user activity.
  *   - message (string|null): An error message if no activity is found or another issue occurs.
  */
-export const calculateScore = async (
+export const aggregateUserActivity = async (
 	db,
 	userId,
 	startDate = null,
