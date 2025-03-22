@@ -6,13 +6,56 @@ const { Router } = express;
 
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
+import { processImportFiles } from "./functions/processImportFiles.js";
+import { updateDbUsers } from "./functions/updateDbUsers.js";
+import { updateUsersActivity } from "./functions/updateUsersActivity.js";
 import messageRouter from "./messages/messageRouter.js";
+import { processUpload } from "./middlewares/processUpload.js";
+import { zipExtractor } from "./middlewares/zipExtractor.js";
+import { CLIENT_ID, CLIENT_SECRET } from "./utils/config.cjs";
+import logger from "./utils/logger.js";
 const fetch = (...args) =>
 	import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 dotenv.config();
 const api = Router();
 const app = express();
+
+// Middleware to verify the token
+
+// Middleware to verify the token
+const verifyToken = async (req, res, next) => {
+	const token = req.get("Authorization"); // Authorization: Bearer <token>
+
+	if (!token) {
+		return res
+			.status(401)
+			.json({ success: false, message: "Authorization token is required" });
+	}
+
+	try {
+		const response = await fetch("https://api.github.com/user", {
+			method: "GET",
+			headers: {
+				Authorization: token,
+			},
+		});
+
+		if (response.ok) {
+			const userData = await response.json();
+			req.userData = userData; // Attach user data to the request
+			next();
+		} else {
+			return res
+				.status(401)
+				.json({ success: false, message: "Invalid or expired token" });
+		}
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ success: false, message: "Error verifying token", error });
+	}
+};
 
 app.use(
 	cors({
@@ -24,31 +67,56 @@ app.use(bodyParser.json());
 
 api.use("/message", messageRouter);
 
-api.get("/getUserData", async (req, res) => {
-	const authHeader = req.get("Authorization");
-	if (!authHeader) {
-		return res.status(401).json({ error: "Authorization token missing" });
+app.post("/getAccessToken", async (req, res) => {
+	const { code } = req.body; // Get the code from the request body
+	if (!code) {
+		return res
+			.status(400)
+			.json({ success: false, message: "Code parameter is required" });
 	}
 
+	const params = new URLSearchParams({
+		client_id: CLIENT_ID,
+		client_secret: CLIENT_SECRET,
+		code,
+	});
+
 	try {
-		const response = await fetch("https://api.github.com/user", {
-			method: "GET",
-			headers: {
-				Authorization: authHeader,
+		const response = await fetch(
+			`https://github.com/login/oauth/access_token?${params.toString()}`,
+			{
+				method: "POST",
+				headers: { Accept: "application/json" },
 			},
-		});
+		);
 
 		const data = await response.json();
 
-		if (response.ok) {
-			res.json(data);
+		if (data.access_token) {
+			return res.json({ access_token: data.access_token });
 		} else {
-			res
-				.status(500)
-				.json({ error: data.message || "Failed to fetch user data" });
+			return res
+				.status(400)
+				.json({ success: false, message: "Failed to retrieve access token" });
 		}
 	} catch (error) {
-		res.status(500).json({ error });
+		return res.status(500).json({
+			success: false,
+			message: "Internal server error",
+			error: error.toString(),
+		});
+	}
+});
+
+// Protected Route: Get User Data
+api.get("/getUserData", verifyToken, async (req, res) => {
+	try {
+		const userData = req.userData;
+		res.json(userData);
+	} catch (error) {
+		res
+			.status(500)
+			.json({ success: false, message: "Failed to get user data", error });
 	}
 });
 
@@ -109,6 +177,32 @@ api.get("/fetch-users", async (req, res) => {
 		}
 	} catch (error) {
 		res.status(500).json({ message: "Internal Server Error" });
+	}
+});
+
+api.post("/upload", processUpload, async (req, res) => {
+	try {
+		const slackZipBuffer = req.file.buffer;
+		const extractedDir = zipExtractor(slackZipBuffer);
+
+		const processedActivity = processImportFiles(extractedDir);
+
+		const isUsersInserted = await updateDbUsers(extractedDir, db);
+
+		if (!isUsersInserted.success) {
+			return res.status(500).json({});
+		}
+
+		const isActivityInserted = await updateUsersActivity(processedActivity, db);
+
+		if (!isActivityInserted.success) {
+			return res.status(500).json({});
+		}
+
+		return res.status(200).json({});
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({});
 	}
 });
 

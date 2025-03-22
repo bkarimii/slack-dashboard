@@ -12,7 +12,6 @@ const migration = {
 	up(pgm) {
 		pgm.createTable("slack_user_activity", {
 			id: { type: "serial", primaryKey: true },
-			channel: { type: "text", notNull: true },
 			date: { type: "date", notNull: true },
 			user_id: {
 				type: "text",
@@ -24,6 +23,12 @@ const migration = {
 			reactions: { type: "integer", default: 0, notNull: true },
 			reactions_received: { type: "integer", default: 0, notNull: true },
 		});
+
+		pgm.addConstraint(
+			"slack_user_activity",
+			"unique_date_user",
+			"UNIQUE (date, user_id)",
+		);
 	},
 
 	down(pgm) {

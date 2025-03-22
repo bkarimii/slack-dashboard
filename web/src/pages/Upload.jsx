@@ -21,7 +21,7 @@ export const FileUploading = () => {
 
 		setUploading(true);
 
-		fetch("http://localhost:3000/api/upload/api/upload", {
+		fetch("/api/upload", {
 			method: "POST",
 			body: formData,
 		})
