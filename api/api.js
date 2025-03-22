@@ -100,4 +100,57 @@ api.post("/upload", processUpload, async (req, res) => {
 	}
 });
 
+api.put("/config", async (req, res) => {
+	const {
+		lowTreshholds,
+		mediumTreshholds,
+		highTreshHolds,
+		messagesWeighting,
+		reactionsWeighting,
+		reactionsReceivedWeighting,
+	} = req.body;
+
+	if (
+		!Number.isInteger(lowTreshholds) ||
+		!Number.isInteger(mediumTreshholds) ||
+		!Number.isInteger(highTreshHolds) ||
+		!Number.isFinite(messagesWeighting) ||
+		!Number.isFinite(reactionsWeighting) ||
+		!Number.isFinite(reactionsReceivedWeighting)
+	) {
+		return res.status(400).json({});
+	}
+
+	try {
+		const updateQuery = `
+      UPDATE config_table 
+      SET 
+        low_threshold = $1, 
+        medium_threshold = $2, 
+        high_threshold = $3,
+        message_weighting = $4,
+        reactions_weighting = $5,
+        reactions_received_weighting = $6
+      WHERE id = 1
+    `;
+		const updatedConfigs = await db.query(updateQuery, [
+			lowTreshholds,
+			mediumTreshholds,
+			highTreshHolds,
+			messagesWeighting,
+			reactionsWeighting,
+			reactionsReceivedWeighting,
+		]);
+
+		if (updatedConfigs.rowCount === 0) {
+			return res.status(404).json({});
+		}
+
+		return res.status(200).json({});
+	} catch (error) {
+		logger.error(error);
+		return res.status(500).json({});
+	}
+});
+
 export default api;
