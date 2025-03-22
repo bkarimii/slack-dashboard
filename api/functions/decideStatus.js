@@ -1,4 +1,4 @@
-import logger from "../utils/logger";
+import logger from "../utils/logger.js";
 
 import { aggregateUserActivity } from "./aggregateUserActivity.js";
 import { decideScore } from "./decideScore.js";
