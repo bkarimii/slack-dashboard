@@ -9,10 +9,12 @@ export const decideStatus = async (configTable, userId, userActivity) => {
 
 		// @todo updated version of decideScore should be replaced when it was mreged
 		if (aggregatedActivity.success) {
-			const score = decideScore(
-				aggregatedActivity.countActivity.messagesCount,
-				aggregatedActivity.countActivity.reactionsCount,
-			);
+			const score = decideScore({
+				messages: aggregatedActivity.countActivity.messagesCount,
+				reactions: aggregatedActivity.countActivity.reactionsCount,
+				messageWeight: configTable.message_weighting,
+				reactionWeight: configTable.reactions_weighting,
+			});
 
 			if (score < configTable.low_threshold) {
 				return { success: true, status: "inactive" };
