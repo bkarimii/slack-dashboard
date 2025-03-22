@@ -1,5 +1,3 @@
-import bodyParser from "body-parser";
-import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 const { Router } = express;
@@ -19,31 +17,28 @@ const fetch = (...args) =>
 
 dotenv.config();
 const api = Router();
-const app = express();
 
-// Middleware to verify the token
-
-// Middleware to verify the token
 const verifyToken = async (req, res, next) => {
-	const token = req.get("Authorization"); // Authorization: Bearer <token>
+	const authHeader = req.headers.authorization;
 
-	if (!token) {
-		return res
-			.status(401)
-			.json({ success: false, message: "Authorization token is required" });
+	if (!authHeader?.startsWith("Bearer ")) {
+		return res.status(401).json({ error: "Unauthorized: No token provided" });
 	}
+
+	const accessToken = authHeader.split(" ")[1];
 
 	try {
 		const response = await fetch("https://api.github.com/user", {
 			method: "GET",
 			headers: {
-				Authorization: token,
+				Authorization: `Bearer ${accessToken}`,
+				Accept: "application/json",
 			},
 		});
 
 		if (response.ok) {
 			const userData = await response.json();
-			req.userData = userData; // Attach user data to the request
+			req.user = userData;
 			next();
 		} else {
 			return res
@@ -57,18 +52,11 @@ const verifyToken = async (req, res, next) => {
 	}
 };
 
-app.use(
-	cors({
-		origin: "http://localhost:3000",
-		credentials: true,
-	}),
-);
-app.use(bodyParser.json());
-
 api.use("/message", messageRouter);
 
-app.post("/getAccessToken", async (req, res) => {
-	const { code } = req.body; // Get the code from the request body
+api.post("/getAccessToken", async (req, res) => {
+	const { code } = req.body;
+
 	if (!code) {
 		return res
 			.status(400)
@@ -82,7 +70,7 @@ app.post("/getAccessToken", async (req, res) => {
 	});
 
 	try {
-		const response = await fetch(
+		const tokenResponse = await fetch(
 			`https://github.com/login/oauth/access_token?${params.toString()}`,
 			{
 				method: "POST",
@@ -90,15 +78,15 @@ app.post("/getAccessToken", async (req, res) => {
 			},
 		);
 
-		const data = await response.json();
+		const tokenData = await tokenResponse.json();
 
-		if (data.access_token) {
-			return res.json({ access_token: data.access_token });
-		} else {
+		if (!tokenData.access_token) {
 			return res
 				.status(400)
 				.json({ success: false, message: "Failed to retrieve access token" });
 		}
+
+		return res.json({ success: true, access_token: tokenData.access_token });
 	} catch (error) {
 		return res.status(500).json({
 			success: false,
@@ -108,15 +96,34 @@ app.post("/getAccessToken", async (req, res) => {
 	}
 });
 
-// Protected Route: Get User Data
-api.get("/getUserData", verifyToken, async (req, res) => {
+api.post("/getUserData", async (req, res) => {
+	const { access_token } = req.body;
+
+	if (!access_token) {
+		return res.status(400).json({
+			success: false,
+			message: "Access token is required to fetch user data",
+		});
+	}
+
 	try {
-		const userData = req.userData;
-		res.json(userData);
+		const userResponse = await fetch("https://api.github.com/user", {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${access_token}`,
+				Accept: "application/json",
+			},
+		});
+
+		const userData = await userResponse.json();
+
+		return res.json({ success: true, user: userData });
 	} catch (error) {
-		res
-			.status(500)
-			.json({ success: false, message: "Failed to get user data", error });
+		return res.status(500).json({
+			success: false,
+			message: "Internal server error",
+			error: error.toString(),
+		});
 	}
 });
 
@@ -166,11 +173,11 @@ api.post("/subscribe", async (req, res) => {
 	}
 });
 
-api.get("/fetch-users", async (req, res) => {
+api.get("/fetch-users", verifyToken, async (req, res) => {
 	try {
 		const result = await db.query("SELECT * FROM all_users");
 
-		if (!result.rows.length === 0) {
+		if (!result.rows.length) {
 			res.status(404).json({ success: false, message: "User not fund" });
 		} else {
 			res.status(200).json(result.rows);
@@ -180,7 +187,7 @@ api.get("/fetch-users", async (req, res) => {
 	}
 });
 
-api.post("/upload", processUpload, async (req, res) => {
+api.post("/upload", verifyToken, processUpload, async (req, res) => {
 	try {
 		const slackZipBuffer = req.file.buffer;
 		const extractedDir = zipExtractor(slackZipBuffer);

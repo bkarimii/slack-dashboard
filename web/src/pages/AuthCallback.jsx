@@ -1,42 +1,63 @@
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { AuthContext } from "../components/AuthContext";
+
 function AuthCallback() {
+	const { setUserData } = useContext(AuthContext);
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		const code = urlParams.get("code");
+		const authenticateUser = async () => {
+			const urlParams = new URLSearchParams(window.location.search);
+			const code = urlParams.get("code");
 
-		if (code) {
-			fetch(`http://localhost:3000/getAccessToken?code=${code}`)
-				.then((response) => {
-					// Log the raw response
-					console.log("Response:", response);
-					return response.json();
-				})
-				.then((data) => {
-					try {
-						const jsonData = JSON.parse(data); // Attempt to parse as JSON
-						if (jsonData.access_token) {
-							localStorage.setItem("accessToken", jsonData.access_token);
-							navigate("/"); // Redirect to a protected page
+			if (code) {
+				try {
+					const response = await fetch(`/api/getAccessToken`, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ code }),
+					});
+
+					const data = await response.json();
+
+					if (data.access_token) {
+						localStorage.setItem("accessToken", data.access_token);
+
+						const userDataResponse = await fetch(`/api/getUserData`, {
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+							},
+							body: JSON.stringify({ access_token: data.access_token }),
+						});
+
+						const userData = await userDataResponse.json();
+
+						if (userData.user) {
+							setUserData(userData.user);
+							navigate("/dashboard");
 						} else {
-							navigate("/login"); // Redirect to login on error
+							navigate("/login");
 						}
-					} catch (error) {
-						console.error("Error parsing response:", error);
-						navigate("/login"); // Handle the error case
+					} else {
+						navigate("/login");
 					}
-				})
-				.catch((error) => {
-					console.error("Error during authentication", error);
-					navigate("/login"); // Handle the error case
-				});
-		} else {
-			navigate("/login"); // Handle missing code
-		}
-	}, [navigate]);
+				} catch (error) {
+					console.error(
+						"Error during authentication or fetching user data",
+						error,
+					);
+					navigate("/login");
+				}
+			} else {
+				navigate("/login");
+			}
+		};
+
+		authenticateUser();
+	}, [setUserData, navigate]);
 
 	return (
 		<div>
