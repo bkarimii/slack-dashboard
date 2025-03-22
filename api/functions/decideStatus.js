@@ -1,9 +1,9 @@
-import logger from "../utils/logger";
+import logger from "../utils/logger.js";
 
 import { aggregateUserActivity } from "./aggregateUserActivity.js";
 import { decideScore } from "./decideScore.js";
 
-export const decideStatus = async (configTable, userId, userActivity) => {
+export const decideStatus = (configTable, userId, userActivity) => {
 	try {
 		const aggregatedActivity = aggregateUserActivity(userId, userActivity);
 
