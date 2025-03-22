@@ -3,12 +3,8 @@ import logger from "../utils/logger";
 import { aggregateUserActivity } from "./aggregateUserActivity.js";
 import { decideScore } from "./decideScore.js";
 
-export const decideStatus = async (db, userId, userActivity) => {
+export const decideStatus = async (configTable, userId, userActivity) => {
 	try {
-		const result = await db.query("SELECT * FROM config_table");
-
-		const configTable = result.rows[0];
-
 		const aggregatedActivity = aggregateUserActivity(userId, userActivity);
 
 		// @todo updated version of decideScore should be replaced when it was mreged
