@@ -8,15 +8,15 @@ import logger from "../utils/logger.js";
  *
  * @param {string|number} userId - The unique identifier for the user whose activity is being aggregated.
  * @param {Array<Object>} userActivity - An array of activity data objects for users, where each object
- *                                        contains properties like `user_id`, `messages`, `reactions`,
- *                                        and `reactions_received`.
+ * contains properties like `user_id`, `messages`, `reactions`,
+ *and `reactions_received`.
  *
  * @returns {Object} - The result object contains the following:
- *   - `success` (boolean): Indicates whether the aggregation was successful.
- *   - `countActivity` (Object): An object containing the aggregated activity counts:
- *     - `messagesCount` (number): The total number of messages for the user.
- *     - `reactionsCount` (number): The total number of reactions by the user.
- *     - `reactionsReceivedCount` (number): The total number of reactions received by the user.
+ *- `success` (boolean): Indicates whether the aggregation was successful.
+ *- `countActivity` (Object): An object containing the aggregated activity counts:
+ *- `messagesCount` (number): The total number of messages for the user.
+ *- `reactionsCount` (number): The total number of reactions by the user.
+ *- `reactionsReceivedCount` (number): The total number of reactions received by the user.
  *
  * @returns {object} - If an error occurs during the aggregation process, an error is logged and
  *  object containing a boolean with false and a message is returned.
