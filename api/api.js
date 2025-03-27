@@ -25,26 +25,26 @@ const verifyToken = async (req, res, next) => {
 		return res.status(401).json({ error: "Unauthorized: No token provided" });
 	}
 
-	const accessToken = authHeader.split(" ")[1];
+	const accessToken = authHeader;
 
 	try {
 		const response = await fetch("https://api.github.com/user", {
 			method: "GET",
 			headers: {
-				Authorization: `Bearer ${accessToken}`,
+				Authorization: accessToken,
 				Accept: "application/json",
 			},
 		});
 
-		if (response.ok) {
-			const userData = await response.json();
-			req.user = userData;
-			next();
-		} else {
+		if (!response.ok) {
 			return res
 				.status(401)
 				.json({ success: false, message: "Invalid or expired token" });
 		}
+
+		const userData = await response.json();
+		req.user = userData;
+		next();
 	} catch (error) {
 		return res
 			.status(500)

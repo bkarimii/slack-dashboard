@@ -2,7 +2,7 @@ import { ConfigProvider } from "antd";
 import { Route, Routes } from "react-router-dom";
 
 import "./App.css";
-import AuthProvider from "./components/AuthProvider.jsx";
+import { AuthProvider } from "./components/AuthProvider.jsx";
 import About from "./pages/About.jsx";
 import AuthCallback from "./pages/AuthCallback.jsx";
 import { ConfirmationPage } from "./pages/ConfirmationPage.jsx";

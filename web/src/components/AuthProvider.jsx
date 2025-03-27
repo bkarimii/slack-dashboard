@@ -1,9 +1,9 @@
-import PropTypes from "prop-types";
 import { useState, useEffect, useMemo } from "react";
 
 import { AuthContext } from "./AuthContext";
+/* eslint-disable react/prop-types */
 
-function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
 	const [userData, setUserData] = useState(() => {
 		const storedUserData = localStorage.getItem("userData");
 		return storedUserData ? JSON.parse(storedUserData) : null;
@@ -22,9 +22,4 @@ function AuthProvider({ children }) {
 	return (
 		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 	);
-}
-AuthProvider.propTypes = {
-	children: PropTypes.node.isRequired,
 };
-
-export default AuthProvider;
