@@ -6,7 +6,7 @@ import { AuthContext } from "../components/AuthContext";
 import { ThemedButton } from "../components/ThemedButton";
 
 function Home() {
-	const { userData } = useContext(AuthContext);
+	const { userData } = useContext(AuthContext) || {};
 	const navigate = useNavigate();
 
 	return (
