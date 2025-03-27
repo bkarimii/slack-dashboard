@@ -1,9 +1,12 @@
 import { CheckCircleFilled } from "@ant-design/icons";
 import { Typography, Button, Row, Col } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
 export const ConfirmationPage = () => {
+	const navigate = useNavigate();
+
 	return (
 		<Row
 			justify="center"
@@ -41,6 +44,7 @@ export const ConfirmationPage = () => {
 				<div>
 					<Button
 						size="middle"
+						onClick={() => navigate("/")}
 						style={{
 							marginTop: "15px",
 						}}
