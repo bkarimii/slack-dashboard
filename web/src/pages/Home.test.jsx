@@ -12,7 +12,7 @@ describe("Home component", () => {
 
 	it("renders the login button", () => {
 		render(<Home />);
-		const headingElement = screen.getByText(/CYF Slack Dashboard/i);
+		const headingElement = screen.getByText(/CYF Slack/i);
 		expect(headingElement).toBeInTheDocument();
 	});
 });
