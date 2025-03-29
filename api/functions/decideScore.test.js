@@ -16,7 +16,7 @@ describe("decideScore", () => {
 		expect(score).toBe(69);
 	});
 
-	it("should return 30 when there are 10 messages and 10 reactions and reactionsReceived = 5", () => {
+	it("should return 45 when there are 10 messages and 10 reactions and reactionsReceived = 5", () => {
 		const score = decideScore({
 			messages: 10,
 			reactions: 10,
@@ -34,7 +34,7 @@ describe("decideScore", () => {
 		const score = decideScore({
 			messages: 0,
 			reactions: 0,
-			reactionsReceived: 0,
+			reactionsReceived: Math.floor(Math.random() * 10),
 		});
 		expect(score).toBe(0);
 	});
