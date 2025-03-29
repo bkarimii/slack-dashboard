@@ -31,24 +31,19 @@ export const decideScore = ({
 	if (!Number.isFinite(reactions)) reactions = 0;
 	if (!Number.isFinite(reactionsReceived)) reactionsReceived = 0;
 
-	if (messages > 0 && reactions > 0) {
-		return (
-			messageWeight * messages +
-			reactionWeight * reactions +
-			reactionsReceivedWeight * reactionsReceived
-		);
-	}
-
 	if (messages <= 0 && reactions <= 0) return 0;
 
-	// If there are no messages, ignore reactionsReceived.
-	if (!messages) {
-		return reactionWeight * reactions;
-	}
+	// if no messages then no reactions received.
+	if (!messages) return reactionWeight * reactions;
 
-	if (!reactions) {
+	if (!reactions)
 		return (
 			messageWeight * messages + reactionsReceivedWeight * reactionsReceived
 		);
-	}
+
+	return (
+		messageWeight * messages +
+		reactionWeight * reactions +
+		reactionsReceivedWeight * reactionsReceived
+	);
 };
