@@ -140,7 +140,6 @@ api.get("/users/status-counts", async (req, res) => {
 	}
 });
 
-
 api.put("/config", async (req, res) => {
 	const {
 		lowTreshholds,
