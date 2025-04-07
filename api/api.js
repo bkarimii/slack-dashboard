@@ -120,8 +120,11 @@ api.get("/users/status-counts", async (req, res) => {
 		const overalStatus = { low: 0, medium: 0, high: 0, inactive: 0 };
 
 		for (const user of allusers) {
-			// @todo... inside decideStatus , decideScore should be updated with latest changes
-			const status = decideStatus(configTable, user.user_id, userActivities);
+			const status = await decideStatus(
+				configTable,
+				user.user_id,
+				userActivities,
+			);
 
 			if (status.success) {
 				overalStatus[status.status] += 1;
@@ -136,6 +139,7 @@ api.get("/users/status-counts", async (req, res) => {
 		res.status(500).json({ msg: "server error" });
 	}
 });
+
 api.put("/config", async (req, res) => {
 	const {
 		lowTreshholds,
