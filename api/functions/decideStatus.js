@@ -43,7 +43,8 @@ export const decideStatus = async (configTable, userId, userActivity) => {
 		const score = decideScore({
 			messages: aggregatedActivity.countActivity.messagesCount,
 			reactions: aggregatedActivity.countActivity.reactionsCount,
-			reactionsReceived:aggregatedActivity.countActivity.reactionsReceivedCount,
+			reactionsReceived:
+				aggregatedActivity.countActivity.reactionsReceivedCount,
 			messageWeight: configTable.message_weighting,
 			reactionWeight: configTable.reactions_weighting,
 			reactionsReceivedWeight: configTable.reactions_received_weighting,
