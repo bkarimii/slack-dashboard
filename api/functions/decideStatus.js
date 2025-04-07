@@ -33,7 +33,6 @@ export const decideStatus = async (configTable, userId, userActivity) => {
 	try {
 		const aggregatedActivity = aggregateUserActivity(userId, userActivity);
 
-		// @todo updated version of decideScore should be replaced when it was merged
 		if (!aggregatedActivity.success) {
 			return {
 				success: false,
@@ -44,8 +43,11 @@ export const decideStatus = async (configTable, userId, userActivity) => {
 		const score = decideScore({
 			messages: aggregatedActivity.countActivity.messagesCount,
 			reactions: aggregatedActivity.countActivity.reactionsCount,
+			reactionsReceived:
+				aggregatedActivity.countActivity.reactionsReceivedCount,
 			messageWeight: configTable.message_weighting,
 			reactionWeight: configTable.reactions_weighting,
+			reactionsReceivedWeight: configTable.reactions_received_weighting,
 		});
 
 		if (score < configTable.low_threshold) {
