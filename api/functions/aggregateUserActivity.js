@@ -18,6 +18,7 @@ import logger from "../utils/logger.js";
  *- `reactionsCount` (number): The total number of reactions by the user.
  *- `reactionsReceivedCount` (number): The total number of reactions received by the user.
  *
+ *
  * @returns {object} - If an error occurs during the aggregation process, an error is logged and
  *  object containing a boolean with false and a message is returned.
  */
