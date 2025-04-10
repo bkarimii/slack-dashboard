@@ -1,12 +1,23 @@
 import { UploadOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload, Card, Typography, Divider } from "antd";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { AuthContext } from "../components/AuthContext";
 const { Title, Text } = Typography;
 
 export const FileUploading = () => {
 	const [fileList, setFileList] = useState([]);
 	const [uploading, setUploading] = useState(false);
+
+	const { userData } = useContext(AuthContext);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!userData?.login) {
+			navigate("/login");
+		}
+	}, [userData, navigate]);
 
 	const handleUpload = () => {
 		if (fileList.length === 0) {
@@ -23,6 +34,10 @@ export const FileUploading = () => {
 
 		fetch("/api/upload", {
 			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + localStorage.getItem("accessToken"),
+			},
 			body: formData,
 		})
 			.then((res) => {
@@ -53,97 +68,105 @@ export const FileUploading = () => {
 				return false;
 			}
 			setFileList((prevList) => [...prevList, file]);
-			return true; // Allow the file to be added to the list
+			return true;
 		},
 		fileList,
 		accept: ".zip",
 	};
 
 	return (
-		<div
-			style={{
-				display: "flex",
-				justifyContent: "center",
-				alignItems: "center",
-				height: "100vh",
-				padding: "16px",
-				backgroundColor: "#f4f6f8",
-			}}
-		>
-			<Card
-				style={{
-					width: "100%",
-					maxWidth: 500, // ✅ Responsive fix: works on mobile & desktop
-					textAlign: "center",
-					padding: "24px",
-					borderRadius: "10px",
-					boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-				}}
-			>
-				<CloudUploadOutlined style={{ fontSize: "50px", color: "#1890ff" }} />
-
-				<Title level={3} style={{ marginTop: 16 }}>
-					Upload Your Slack Export ZIP File
-				</Title>
-				<Text type="secondary">
-					This page allows you to upload a ZIP file containing your exported
-					Slack data. If you haven&apos;t exported your Slack workspace data
-					yet, follow the steps below.
-				</Text>
-				<Divider />
-
-				<Title level={5}>How to Export Your Slack Data:</Title>
-				<ul style={{ textAlign: "left", paddingLeft: 24 }}>
-					<li>Go to your Slack workspace settings.</li>
-					<li>
-						Navigate to{" "}
-						<strong>Settings & Administration → Workspace settings</strong>.
-					</li>
-					<li>
-						Find the <strong>Import/Export Data</strong> section.
-					</li>
-					<li>Request an export and download the resulting ZIP file.</li>
-				</ul>
-
-				<Text type="secondary">
-					For detailed instructions, check out{" "}
-					<a
-						href="https://slack.com/help/articles/201658943-Export-your-workspace-data"
-						target="_blank"
-						rel="noopener noreferrer"
-						style={{ marginLeft: 4 }}
-					>
-						this Slack help article.
-					</a>
-				</Text>
-
-				<Divider />
-
-				<Upload {...props} showUploadList={{ showRemoveIcon: true }}>
-					<Button
-						icon={<UploadOutlined />}
-						style={{ width: "100%", marginBottom: 12 }}
-					>
-						Select File
-					</Button>
-				</Upload>
-
-				{/* 🔽 We deliberately don't disable this button for accessibility reasons🔽 */}
-				<Button
-					type="primary"
-					onClick={() => {
-						if (fileList.length === 0) {
-							message.error("Please select a ZIP file before uploading.");
-							return;
-						}
-						handleUpload();
+		<>
+			{userData ? (
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						height: "100vh",
+						padding: "16px",
+						backgroundColor: "#f4f6f8",
 					}}
-					loading={uploading}
-					style={{ width: "100%", marginTop: 12 }}
 				>
-					{uploading ? "Uploading..." : "Start Upload"}
-				</Button>
-			</Card>
-		</div>
+					<Card
+						style={{
+							width: "100%",
+							maxWidth: 500, // ✅ Responsive fix: works on mobile & desktop
+							textAlign: "center",
+							padding: "24px",
+							borderRadius: "10px",
+							boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+						}}
+					>
+						<CloudUploadOutlined
+							style={{ fontSize: "50px", color: "#1890ff" }}
+						/>
+
+						<Title level={3} style={{ marginTop: 16 }}>
+							Upload Your Slack Export ZIP File
+						</Title>
+						<Text type="secondary">
+							This page allows you to upload a ZIP file containing your exported
+							Slack data. If you haven&apos;t exported your Slack workspace data
+							yet, follow the steps below.
+						</Text>
+						<Divider />
+
+						<Title level={5}>How to Export Your Slack Data:</Title>
+						<ul style={{ textAlign: "left", paddingLeft: 24 }}>
+							<li>Go to your Slack workspace settings.</li>
+							<li>
+								Navigate to{" "}
+								<strong>Settings & Administration → Workspace settings</strong>.
+							</li>
+							<li>
+								Find the <strong>Import/Export Data</strong> section.
+							</li>
+							<li>Request an export and download the resulting ZIP file.</li>
+						</ul>
+
+						<Text type="secondary">
+							For detailed instructions, check out{" "}
+							<a
+								href="https://slack.com/help/articles/201658943-Export-your-workspace-data"
+								target="_blank"
+								rel="noopener noreferrer"
+								style={{ marginLeft: 4 }}
+							>
+								this Slack help article.
+							</a>
+						</Text>
+
+						<Divider />
+
+						<Upload {...props} showUploadList={{ showRemoveIcon: true }}>
+							<Button
+								icon={<UploadOutlined />}
+								style={{ width: "100%", marginBottom: 12 }}
+							>
+								Select File
+							</Button>
+						</Upload>
+
+						{/* 🔽 We deliberately don't disable this button for accessibility reasons🔽 */}
+						<Button
+							type="primary"
+							onClick={() => {
+								if (fileList.length === 0) {
+									message.error("Please select a ZIP file before uploading.");
+									return;
+								}
+								handleUpload();
+							}}
+							loading={uploading}
+							style={{ width: "100%", marginTop: 12 }}
+						>
+							{uploading ? "Uploading..." : "Start Upload"}
+						</Button>
+					</Card>
+				</div>
+			) : (
+				navigate("/login")
+			)}
+		</>
 	);
 };

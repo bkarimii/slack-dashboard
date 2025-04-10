@@ -1,3 +1,5 @@
+import bodyParser from "body-parser";
+import cors from "cors";
 import express from "express";
 
 import apiRouter from "./api.js";
@@ -14,6 +16,7 @@ import {
 
 const apiRoot = "/api";
 const app = express();
+app.use(cors());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -33,6 +36,7 @@ app.get(
 	}),
 );
 
+app.use(bodyParser.json());
 app.use(apiRoot, apiRouter);
 
 app.use(clientRouter(apiRoot));
