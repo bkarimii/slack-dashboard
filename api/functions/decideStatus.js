@@ -27,6 +27,7 @@ import { decideScore } from "./decideScore.js";
  * @returns {Object} An object containing the success status and the user's activity status.
  * @returns {boolean} return.success - Whether the operation was successful.
  * @returns {string} return.status - The status of the user: "inactive", "low", "medium", or "high", or an error message if the process failed.
+ * @throws {Error} If the user activity could not be aggregated or if there is an issue with the score calculation.
  
  */
 export const decideStatus = async (configTable, userId, userActivity) => {
@@ -35,10 +36,8 @@ export const decideStatus = async (configTable, userId, userActivity) => {
 
 		// @todo updated version of decideScore should be replaced when it was merged
 		if (!aggregatedActivity.success) {
-			return {
-				success: false,
-				status: "activity has not been fetched correctly",
-			};
+			logger.error("activity has not been fetched correctly");
+			throw Error("activity has not been fetched correctly");
 		}
 
 		const score = decideScore({
@@ -59,6 +58,6 @@ export const decideStatus = async (configTable, userId, userActivity) => {
 		}
 	} catch (error) {
 		logger.error(error);
-		return { success: false, status: "unknown error happened" };
+		throw error;
 	}
 };
