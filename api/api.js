@@ -1,4 +1,6 @@
-import { Router } from "express";
+import dotenv from "dotenv";
+import express from "express";
+const { Router } = express;
 
 import db from "./db.js";
 import { decideStatus } from "./functions/decideStatus.js";
@@ -9,11 +11,122 @@ import { updateUsersActivity } from "./functions/updateUsersActivity.js";
 import messageRouter from "./messages/messageRouter.js";
 import { processUpload } from "./middlewares/processUpload.js";
 import { zipExtractor } from "./middlewares/zipExtractor.js";
+import { CLIENT_ID, CLIENT_SECRET } from "./utils/config.cjs";
 import logger from "./utils/logger.js";
+const fetch = (...args) =>
+	import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
+dotenv.config();
 const api = Router();
 
+const verifyToken = async (req, res, next) => {
+	const authHeader = req.headers.authorization;
+
+	if (!authHeader?.startsWith("Bearer ")) {
+		return res.status(401).json({ error: "Unauthorized: No token provided" });
+	}
+
+	const accessToken = authHeader;
+
+	try {
+		const response = await fetch("https://api.github.com/user", {
+			method: "GET",
+			headers: {
+				Authorization: accessToken,
+				Accept: "application/json",
+			},
+		});
+
+		if (!response.ok) {
+			return res
+				.status(401)
+				.json({ success: false, message: "Invalid or expired token" });
+		}
+
+		const userData = await response.json();
+		req.user = userData;
+		next();
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ success: false, message: "Error verifying token", error });
+	}
+};
+
 api.use("/message", messageRouter);
+
+api.post("/getAccessToken", async (req, res) => {
+	const { code } = req.body;
+
+	if (!code) {
+		return res
+			.status(400)
+			.json({ success: false, message: "Code parameter is required" });
+	}
+
+	const params = new URLSearchParams({
+		client_id: CLIENT_ID,
+		client_secret: CLIENT_SECRET,
+		code,
+	});
+
+	try {
+		const tokenResponse = await fetch(
+			`https://github.com/login/oauth/access_token?${params.toString()}`,
+			{
+				method: "POST",
+				headers: { Accept: "application/json" },
+			},
+		);
+
+		const tokenData = await tokenResponse.json();
+
+		if (!tokenData.access_token) {
+			return res
+				.status(400)
+				.json({ success: false, message: "Failed to retrieve access token" });
+		}
+
+		return res.json({ success: true, access_token: tokenData.access_token });
+	} catch (error) {
+		return res.status(500).json({
+			success: false,
+			message: "Internal server error",
+			error: error.toString(),
+		});
+	}
+});
+
+api.post("/getUserData", async (req, res) => {
+	const { access_token } = req.body;
+
+	if (!access_token) {
+		return res.status(400).json({
+			success: false,
+			message: "Access token is required to fetch user data",
+		});
+	}
+
+	try {
+		const userResponse = await fetch("https://api.github.com/user", {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${access_token}`,
+				Accept: "application/json",
+			},
+		});
+
+		const userData = await userResponse.json();
+
+		return res.json({ success: true, user: userData });
+	} catch (error) {
+		return res.status(500).json({
+			success: false,
+			message: "Internal server error",
+			error: error.toString(),
+		});
+	}
+});
 
 api.post("/subscribe", async (req, res) => {
 	const email = req.body.email;
@@ -61,11 +174,11 @@ api.post("/subscribe", async (req, res) => {
 	}
 });
 
-api.get("/fetch-users", async (req, res) => {
+api.get("/fetch-users", verifyToken, async (req, res) => {
 	try {
 		const result = await db.query("SELECT * FROM all_users");
 
-		if (!result.rows.length === 0) {
+		if (!result.rows.length) {
 			res.status(404).json({ success: false, message: "User not fund" });
 		} else {
 			res.status(200).json(result.rows);
@@ -75,7 +188,7 @@ api.get("/fetch-users", async (req, res) => {
 	}
 });
 
-api.post("/upload", processUpload, async (req, res) => {
+api.post("/upload", verifyToken, processUpload, async (req, res) => {
 	try {
 		const slackZipBuffer = req.file.buffer;
 		const extractedDir = zipExtractor(slackZipBuffer);
