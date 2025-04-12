@@ -81,19 +81,18 @@ api.post("/upload", processUpload, async (req, res) => {
 
 		const processedActivity = processImportFiles(extractedDir);
 
-		const isUsersInserted = await updateDbUsers(extractedDir, db);
-
-		if (!isUsersInserted.success) {
-			return res.status(500).json({});
-		}
+		await updateDbUsers(extractedDir, db);
 
 		const isActivityInserted = await updateUsersActivity(processedActivity, db);
 
-		if (!isActivityInserted.success) {
-			return res.status(500).json({});
+		if (isActivityInserted) {
+			logger.info(
+				"isActivityInserted in the upload endpoint? => inserted successfully",
+			);
+			return res.status(200).json({});
 		}
 
-		return res.status(200).json({});
+		return res.status(500).json({});
 	} catch (error) {
 		logger.error(error);
 		return res.status(500).json({});

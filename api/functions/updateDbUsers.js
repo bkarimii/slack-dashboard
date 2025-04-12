@@ -12,7 +12,8 @@ export const updateDbUsers = async (extractedDir, db) => {
 	try {
 		// if directory passed is invalid
 		if (!extractedDir) {
-			return { success: false, message: "invalid passed directory" };
+			throw Error("invalid passed directory");
+			// return { success: false, message: "invalid passed directory" };
 		}
 
 		// Find users.json file in the directory
@@ -22,19 +23,23 @@ export const updateDbUsers = async (extractedDir, db) => {
 
 		if (!usersFileEntry) {
 			logger.error("users json file not found in the directory");
-			return {
-				success: false,
-				message: "users json file not found in the directory",
-			};
+			// return {
+			// 	success: false,
+			// 	message: "users json file not found in the directory",
+			// };
+
+			throw Error("users json file not found in the directory");
 		}
 
 		const usersFileContent = usersFileEntry.content;
 
 		if (!usersFileContent) {
-			return {
-				success: false,
-				message: "users.json content is missing or invalid",
-			};
+			// return {
+			// 	success: false,
+			// 	message: "users.json content is missing or invalid",
+			// };
+
+			throw Error("users.json content is missing or invalid");
 		}
 
 		let usersList;
@@ -42,7 +47,8 @@ export const updateDbUsers = async (extractedDir, db) => {
 			usersList = JSON.parse(usersFileContent);
 		} catch (error) {
 			logger.error("Error parsing users.json");
-			return { success: false, message: "Error in parsing users.json" };
+			// return { success: false, message: "Error in parsing users.json" };
+			throw Error("Error in parsing users.json");
 		}
 
 		const activeUsers = usersList.filter(
@@ -57,10 +63,7 @@ export const updateDbUsers = async (extractedDir, db) => {
 
 		if (activeUsers.length === 0) {
 			logger.error("active user is empty.something is wrong");
-			return {
-				success: false,
-				message: "active user is empty.something is wrong",
-			};
+			throw Error("error happened, active users is empty");
 		}
 
 		await db.query("BEGIN");
@@ -91,10 +94,10 @@ export const updateDbUsers = async (extractedDir, db) => {
 		await db.query("COMMIT");
 
 		logger.info("users inserted into database successfully");
-		return { success: true };
+		return true;
 	} catch (error) {
 		await db.query("ROLLBACK");
 		logger.error(error);
-		return { success: false };
+		throw error;
 	}
 };
