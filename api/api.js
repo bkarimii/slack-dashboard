@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import db from "./db.js";
+import { decideStatus } from "./functions/decideStatus.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import { processImportFiles } from "./functions/processImportFiles.js";
 import { updateDbUsers } from "./functions/updateDbUsers.js";
@@ -96,6 +97,45 @@ api.post("/upload", processUpload, async (req, res) => {
 	} catch (error) {
 		logger.error(error);
 		return res.status(500).json({});
+	}
+});
+
+api.get("/users/status-counts", async (req, res) => {
+	const startDate = req.query.start_date;
+	const endDate = req.query.end_date;
+	try {
+		const dbFetchedActivity = await db.query(
+			"select user_id , messages , reactions , reactions_received FROM slack_user_activity WHERE date BETWEEN $1 AND $2 ",
+			[startDate, endDate],
+		);
+		const userActivities = dbFetchedActivity.rows;
+
+		const rawUsers = await db.query("SELECT user_id FROM all_users");
+		const allusers = rawUsers.rows;
+
+		const rawConfigTable = await db.query("SELECT * FROM config_table");
+		const configTable = rawConfigTable.rows[0];
+
+		const overalStatus = { low: 0, medium: 0, high: 0, inactive: 0 };
+
+		for (const user of allusers) {
+			const status = await decideStatus(
+				configTable,
+				user.user_id,
+				userActivities,
+			);
+
+			if (status.success) {
+				overalStatus[status.status] += 1;
+			} else {
+				logger.warn(status.message);
+				return res.status(404).json({});
+			}
+		}
+
+		return res.status(200).json({ status: overalStatus });
+	} catch (error) {
+		res.status(500).json({ msg: "server error" });
 	}
 });
 
