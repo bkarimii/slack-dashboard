@@ -1,30 +1,30 @@
 import { GithubFilled, UserOutlined } from "@ant-design/icons";
 import { Typography, Avatar, Card, Button, Flex } from "antd";
-import { useEffect, useContext } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { AuthContext } from "../components/AuthContext";
+import { usePrincipal } from "../AuthContext";
 
 const Dashboard = () => {
-	const { userData, setUserData } = useContext(AuthContext);
+	const principal = usePrincipal();
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!userData?.login) {
+		if (!principal?.email) {
 			navigate("/login");
 		}
-	}, [userData, navigate]);
+	}, [principal, navigate]);
 
 	const handleLogout = () => {
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("userData");
-		setUserData(null);
+		// setUserData(null);
 		navigate("/");
 	};
 
 	return (
 		<>
-			{userData ? (
+			{principal ? (
 				<Flex
 					align="center"
 					justify="center"
@@ -42,7 +42,7 @@ const Dashboard = () => {
 					>
 						<Avatar
 							size={80}
-							src={userData?.avatar_url}
+							// src={principal?.avatar_url}
 							icon={<UserOutlined />}
 							style={{
 								border: "2px solid #1890ff",
@@ -51,7 +51,7 @@ const Dashboard = () => {
 							}}
 						/>
 						<Typography.Title level={4} style={{ margin: "10px 0" }}>
-							Hey, {userData?.login}!
+							Hey, {principal?.name}!
 						</Typography.Title>
 						<Typography.Text type="secondary">
 							Welcome to your dashboard.

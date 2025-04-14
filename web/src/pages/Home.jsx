@@ -1,13 +1,12 @@
 import { Typography, Flex, Card } from "antd";
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { AuthContext } from "../components/AuthContext";
+import { usePrincipal } from "../AuthContext";
 import { ThemedButton } from "../components/ThemedButton";
 
 function Home() {
-	const { userData } = useContext(AuthContext) || {};
 	const navigate = useNavigate();
+	const principal = usePrincipal();
 
 	return (
 		<Flex
@@ -37,18 +36,18 @@ function Home() {
 				</Typography.Text>
 
 				<Flex justify="center" style={{ marginTop: "30px" }}>
-					{userData?.login ? (
+					{principal ? (
 						<ThemedButton type="primary" onClick={() => navigate("/dashboard")}>
 							<Typography.Title level={5} style={{ color: "#fff", margin: 0 }}>
 								Dashboard
 							</Typography.Title>
 						</ThemedButton>
 					) : (
-						<ThemedButton type="primary" onClick={() => navigate("/login")}>
-							<Typography.Title level={5} style={{ color: "#fff", margin: 0 }}>
-								Login
-							</Typography.Title>
-						</ThemedButton>
+						<Typography.Title level={5} style={{ color: "#fff", margin: 0 }}>
+							<a href={`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`}>
+								Log In
+							</a>
+						</Typography.Title>
 					)}
 				</Flex>
 			</Card>
@@ -57,3 +56,31 @@ function Home() {
 }
 
 export default Home;
+
+// 	return (
+// 		<>
+// 			<h2>Account</h2>
+// 			<table>
+// 				<tbody>
+// 					<tr>
+// 						<th>Name</th>
+// 						<td>{principal?.name}</td>
+// 					</tr>
+// 					<tr>
+// 						<th>Email</th>
+// 						<td>{principal?.email ?? <em>N/A</em>}</td>
+// 					</tr>
+// 				</tbody>
+// 			</table>
+// 			<form
+// 				action="/api/auth/logout"
+// 				aria-labelledby="logout-button"
+// 				method="POST"
+// 			>
+// 				<Button id="logout-button" style="secondary">
+// 					Log out
+// 				</Button>
+// 			</form>
+// 		</>
+// 	);
+// }

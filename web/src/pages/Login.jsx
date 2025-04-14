@@ -7,7 +7,7 @@ import { AuthContext } from "../components/AuthContext";
 import { SubscriptionLogo } from "../components/SubscriptionLogo";
 import { ThemedButton } from "../components/ThemedButton";
 
-const CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
+// const CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
 
 export default function Login() {
 	const navigate = useNavigate();
@@ -20,9 +20,9 @@ export default function Login() {
 	}, [userData, navigate]);
 
 	const handleGitHubLogin = () => {
-		window.location.assign(
-			`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}`,
-		);
+		// window.location.assign(
+		// 	`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}`,
+		// );
 	};
 
 	return (

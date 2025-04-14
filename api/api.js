@@ -2,130 +2,132 @@ import dotenv from "dotenv";
 import express from "express";
 const { Router } = express;
 
+import authRouter from "./auth/authController.js";
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
-import { processImportFiles } from "./functions/processImportFiles.js";
-import { updateDbUsers } from "./functions/updateDbUsers.js";
-import { updateUsersActivity } from "./functions/updateUsersActivity.js";
+// import { processImportFiles } from "./functions/processImportFiles.js";
+// import { updateDbUsers } from "./functions/updateDbUsers.js";
+// import { updateUsersActivity } from "./functions/updateUsersActivity.js";
 import messageRouter from "./messages/messageRouter.js";
-import { processUpload } from "./middlewares/processUpload.js";
-import { zipExtractor } from "./middlewares/zipExtractor.js";
-import { CLIENT_ID, CLIENT_SECRET } from "./utils/config.cjs";
-import logger from "./utils/logger.js";
-const fetch = (...args) =>
-	import("node-fetch").then(({ default: fetch }) => fetch(...args));
+// import { processUpload } from "./middlewares/processUpload.js";
+// import { zipExtractor } from "./middlewares/zipExtractor.js";
+// import { CLIENT_ID, CLIENT_SECRET } from "./utils/authConfig.js";
+import { sudo } from "./utils/authMiddleware.js";
+// import logger from "./utils/logger.js";
 
 dotenv.config();
 const api = Router();
+api.use(sudo);
+api.use("/auth", authRouter);
 
-const verifyToken = async (req, res, next) => {
-	const authHeader = req.headers.authorization;
+// const verifyToken = async (req, res, next) => {
+// 	const authHeader = req.headers.authorization;
 
-	if (!authHeader?.startsWith("Bearer ")) {
-		return res.status(401).json({ error: "Unauthorized: No token provided" });
-	}
+// 	if (!authHeader?.startsWith("Bearer ")) {
+// 		return res.status(401).json({ error: "Unauthorized: No token provided" });
+// 	}
 
-	const accessToken = authHeader;
+// 	const accessToken = authHeader;
 
-	try {
-		const response = await fetch("https://api.github.com/user", {
-			method: "GET",
-			headers: {
-				Authorization: accessToken,
-				Accept: "application/json",
-			},
-		});
+// 	try {
+// 		const response = await fetch("https://api.github.com/user", {
+// 			method: "GET",
+// 			headers: {
+// 				Authorization: accessToken,
+// 				Accept: "application/json",
+// 			},
+// 		});
 
-		if (!response.ok) {
-			return res
-				.status(401)
-				.json({ success: false, message: "Invalid or expired token" });
-		}
+// 		if (!response.ok) {
+// 			return res
+// 				.status(401)
+// 				.json({ success: false, message: "Invalid or expired token" });
+// 		}
 
-		const userData = await response.json();
-		req.user = userData;
-		next();
-	} catch (error) {
-		return res
-			.status(500)
-			.json({ success: false, message: "Error verifying token", error });
-	}
-};
+// 		const userData = await response.json();
+// 		req.user = userData;
+// 		next();
+// 	} catch (error) {
+// 		return res
+// 			.status(500)
+// 			.json({ success: false, message: "Error verifying token", error });
+// 	}
+// };
 
 api.use("/message", messageRouter);
 
-api.post("/getAccessToken", async (req, res) => {
-	const { code } = req.body;
+// api.post("/getAccessToken", async (req, res) => {
+// 	const { code } = req.body;
 
-	if (!code) {
-		return res
-			.status(400)
-			.json({ success: false, message: "Code parameter is required" });
-	}
+// 	if (!code) {
+// 		return res
+// 			.status(400)
+// 			.json({ success: false, message: "Code parameter is required" });
+// 	}
 
-	const params = new URLSearchParams({
-		client_id: CLIENT_ID,
-		client_secret: CLIENT_SECRET,
-		code,
-	});
+// 	const params = new URLSearchParams({
+// 		client_id: CLIENT_ID,
+// 		client_secret: CLIENT_SECRET,
+// 		code,
+// 	});
 
-	try {
-		const tokenResponse = await fetch(
-			`https://github.com/login/oauth/access_token?${params.toString()}`,
-			{
-				method: "POST",
-				headers: { Accept: "application/json" },
-			},
-		);
+// 	try {
+// 		const tokenResponse = await fetch(
+// 			`https://github.com/login/oauth/access_token?${params.toString()}`,
+// 			{
+// 				method: "POST",
+// 				headers: { Accept: "application/json" },
+// 			},
+// 		);
 
-		const tokenData = await tokenResponse.json();
+// 		const tokenData = await tokenResponse.json();
 
-		if (!tokenData.access_token) {
-			return res
-				.status(400)
-				.json({ success: false, message: "Failed to retrieve access token" });
-		}
+// 		if (!tokenData.access_token) {
+// 			return res
+// 				.status(400)
+// 				.json({ success: false, message: "Failed to retrieve access token" });
+// 		}
 
-		return res.json({ success: true, access_token: tokenData.access_token });
-	} catch (error) {
-		return res.status(500).json({
-			success: false,
-			message: "Internal server error",
-			error: error.toString(),
-		});
-	}
-});
+// 		return res.json({ success: true, access_token: tokenData.access_token });
+// 	} catch (error) {
+// 		return res.status(500).json({
+// 			success: false,
+// 			message: "Internal server error",
+// 			error: error.toString(),
+// 		});
+// 	}
+// });
 
-api.post("/getUserData", async (req, res) => {
-	const { access_token } = req.body;
+// api.post("/getUserData", async (req, res) => {
+// 	const { access_token } = req.body;
 
-	if (!access_token) {
-		return res.status(400).json({
-			success: false,
-			message: "Access token is required to fetch user data",
-		});
-	}
+// 	if (!access_token) {
+// 		return res.status(400).json({
+// 			success: false,
+// 			message: "Access token is required to fetch user data",
+// 		});
+// 	}
 
-	try {
-		const userResponse = await fetch("https://api.github.com/user", {
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${access_token}`,
-				Accept: "application/json",
-			},
-		});
+// 	try {
+// 		const userResponse = await fetch("https://api.github.com/user", {
+// 			method: "GET",
+// 			headers: {
+// 				Authorization: `Bearer ${access_token}`,
+// 				Accept: "application/json",
+// 			},
+// 		});
 
-		const userData = await userResponse.json();
+// 		const userData = await userResponse.json();
 
-		return res.json({ success: true, user: userData });
-	} catch (error) {
-		return res.status(500).json({
-			success: false,
-			message: "Internal server error",
-			error: error.toString(),
-		});
-	}
-});
+// 		return res.json({ success: true, user: userData });
+// 	} catch (error) {
+// 		return res.status(500).json({
+// 			success: false,
+// 			message: "Internal server error",
+// 			error: error.toString(),
+// 		});
+// 	}
+// });
 
 api.post("/subscribe", async (req, res) => {
 	const email = req.body.email;
@@ -173,44 +175,44 @@ api.post("/subscribe", async (req, res) => {
 	}
 });
 
-api.get("/fetch-users", verifyToken, async (req, res) => {
-	try {
-		const result = await db.query("SELECT * FROM all_users");
+// api.get("/fetch-users", verifyToken, async (req, res) => {
+// 	try {
+// 		const result = await db.query("SELECT * FROM all_users");
 
-		if (!result.rows.length) {
-			res.status(404).json({ success: false, message: "User not fund" });
-		} else {
-			res.status(200).json(result.rows);
-		}
-	} catch (error) {
-		res.status(500).json({ message: "Internal Server Error" });
-	}
-});
+// 		if (!result.rows.length) {
+// 			res.status(404).json({ success: false, message: "User not fund" });
+// 		} else {
+// 			res.status(200).json(result.rows);
+// 		}
+// 	} catch (error) {
+// 		res.status(500).json({ message: "Internal Server Error" });
+// 	}
+// });
 
-api.post("/upload", verifyToken, processUpload, async (req, res) => {
-	try {
-		const slackZipBuffer = req.file.buffer;
-		const extractedDir = zipExtractor(slackZipBuffer);
+// api.post("/upload", verifyToken, processUpload, async (req, res) => {
+// 	try {
+// 		const slackZipBuffer = req.file.buffer;
+// 		const extractedDir = zipExtractor(slackZipBuffer);
 
-		const processedActivity = processImportFiles(extractedDir);
+// 		const processedActivity = processImportFiles(extractedDir);
 
-		const isUsersInserted = await updateDbUsers(extractedDir, db);
+// 		const isUsersInserted = await updateDbUsers(extractedDir, db);
 
-		if (!isUsersInserted.success) {
-			return res.status(500).json({});
-		}
+// 		if (!isUsersInserted.success) {
+// 			return res.status(500).json({});
+// 		}
 
-		const isActivityInserted = await updateUsersActivity(processedActivity, db);
+// 		const isActivityInserted = await updateUsersActivity(processedActivity, db);
 
-		if (!isActivityInserted.success) {
-			return res.status(500).json({});
-		}
+// 		if (!isActivityInserted.success) {
+// 			return res.status(500).json({});
+// 		}
 
-		return res.status(200).json({});
-	} catch (error) {
-		logger.error(error);
-		return res.status(500).json({});
-	}
-});
+// 		return res.status(200).json({});
+// 	} catch (error) {
+// 		logger.error(error);
+// 		return res.status(500).json({});
+// 	}
+// });
 
 export default api;
