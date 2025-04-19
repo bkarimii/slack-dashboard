@@ -2,8 +2,10 @@ import { Router } from "express";
 
 import db from "./db.js";
 import { decideStatus } from "./functions/decideStatus.js";
+import { getBoxPlotData } from "./functions/getBoxPlotData.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import { processImportFiles } from "./functions/processImportFiles.js";
+import { scoreNormaliser } from "./functions/scoreNormaliser.js";
 import { updateDbUsers } from "./functions/updateDbUsers.js";
 import { updateUsersActivity } from "./functions/updateUsersActivity.js";
 import messageRouter from "./messages/messageRouter.js";
@@ -116,24 +118,16 @@ api.get("/users/status-counts", async (req, res) => {
 		const rawConfigTable = await db.query("SELECT * FROM config_table");
 		const configTable = rawConfigTable.rows[0];
 
-		const overalStatus = { low: 0, medium: 0, high: 0, inactive: 0 };
+		const normalisedScores = scoreNormaliser(
+			allusers,
+			userActivities,
+			configTable,
+		);
 
-		for (const user of allusers) {
-			const status = await decideStatus(
-				configTable,
-				user.user_id,
-				userActivities,
-			);
+		const boxPlotData = getBoxPlotData(normalisedScores);
+		const totalStatus = await decideStatus(normalisedScores, configTable);
 
-			if (status.success) {
-				overalStatus[status.status] += 1;
-			} else {
-				logger.warn(status.message);
-				return res.status(404).json({});
-			}
-		}
-
-		return res.status(200).json({ status: overalStatus });
+		return res.status(200).json({ status: totalStatus, scores: boxPlotData });
 	} catch (error) {
 		res.status(500).json({ msg: "server error" });
 	}
@@ -157,7 +151,15 @@ api.put("/config", async (req, res) => {
 		!Number.isFinite(reactionsWeighting) ||
 		!Number.isFinite(reactionsReceivedWeighting)
 	) {
-		return res.status(400).json({});
+		logger.error("input values are inavalid");
+		return res.status(400).json({ message: "total weight must be 100" });
+	}
+
+	const totalWeights =
+		messagesWeighting + reactionsWeighting + reactionsReceivedWeighting;
+
+	if (totalWeights !== 100) {
+		res.status(400).json({});
 	}
 
 	try {
