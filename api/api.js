@@ -162,6 +162,20 @@ api.put("/config", async (req, res) => {
 		res.status(400).json({});
 	}
 
+	if (lowTreshholds + mediumTreshholds + highTreshHolds !== 100) {
+		logger.error("Thresholds must add up to 100.");
+		return res.status(400).json({});
+	}
+
+	if (
+		!(lowTreshholds < mediumTreshholds && mediumTreshholds < highTreshHolds)
+	) {
+		logger.error(
+			"Thresholds must be in increasing order: low < medium < high.",
+		);
+		return res.status(400).json({});
+	}
+
 	try {
 		const updateQuery = `
       UPDATE config_table 
