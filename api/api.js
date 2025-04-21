@@ -127,7 +127,9 @@ api.get("/users/status-counts", async (req, res) => {
 		const boxPlotData = getBoxPlotData(normalisedScores);
 		const totalStatus = await decideStatus(normalisedScores, configTable);
 
-		return res.status(200).json({ status: totalStatus, scores: boxPlotData });
+		return res
+			.status(200)
+			.json({ status: totalStatus, boxPlotData: boxPlotData });
 	} catch (error) {
 		res.status(500).json({ msg: "server error" });
 	}
