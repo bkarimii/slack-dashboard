@@ -36,7 +36,9 @@ export const scoreNormaliser = (usersArray, userActivity, configTable) => {
 	}
 
 	const maxScore = Math.max(...scoreArray);
-	const normalisedScores = scoreArray.map((score) => (score / maxScore) * 100);
+	const normalisedScores = scoreArray.map((score) =>
+		Math.round((score / maxScore) * 100),
+	);
 
 	return normalisedScores;
 };
