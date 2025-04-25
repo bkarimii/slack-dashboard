@@ -23,18 +23,20 @@ export const decideScore = ({
 	messages,
 	reactions,
 	reactionsReceived,
-	messageWeight = 3,
-	reactionWeight = 1,
-	reactionsReceivedWeight = 1,
+	configTable,
 }) => {
 	if (!Number.isFinite(messages)) messages = 0;
 	if (!Number.isFinite(reactions)) reactions = 0;
 	if (!Number.isFinite(reactionsReceived)) reactionsReceived = 0;
 
+	const messageWeight = configTable.message_weighting;
+	const reactionWeight = configTable.reactions_weighting;
+	const reactionsReceivedWeight = configTable.reactions_received_weighting;
+
 	if (messages <= 0 && reactions <= 0) return 0;
 
 	// if no messages then no reactions received.
-	if (!messages) return reactionWeight * reactions;
+	if (!messages) return (reactionWeight * reactions) / 100;
 
 	if (!reactions)
 		return (

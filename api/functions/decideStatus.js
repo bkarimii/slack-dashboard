@@ -1,63 +1,41 @@
 import logger from "../utils/logger.js";
 
-import { aggregateUserActivity } from "./aggregateUserActivity.js";
-import { decideScore } from "./decideScore.js";
-
 /**
- * Determines the status of a user based on their activity and the provided configuration table.
- * 
- * This function aggregates the user's activity, calculates a score based on messages and reactions,
- * and then returns a status based on predefined threshold values. If any part of the process fails, 
- * an error message will be returned. This is an asynchronous function.
- * 
- * @param {Array<Object>} configTable - An array of configuration objects, each containing thresholds and weights for score calculation. retrieved from DB.
- * @param {number} configTable[].low_threshold - The threshold for the "inactive" status.
- * @param {number} configTable[].medium_threshold - The threshold for the "low" status.
- * @param {number} configTable[].high_threshold - The threshold for the "medium" status.
- * @param {number} configTable[].message_weighting - The weight given to messages in the score calculation.
- * @param {number} configTable[].reactions_weighting - The weight given to reactions in the score calculation.
- * 
- * @param {string} userId - The ID of the user whose status is to be determined.
- * @param {Array<Object>} userActivity - The array of user activity objects returned from another function.
- * @param {string} userActivity[].user_id - The user ID associated with the activity.
- * @param {number} userActivity[].messages - The number of messages sent by the user.
- * @param {number} userActivity[].reactions - The number of reactions sent by the user.
- * @param {number} userActivity[].reactions_received - The number of reactions received by the user.
- * 
- * @returns {Object} An object containing the success status and the user's activity status.
- * @returns {boolean} return.success - Whether the operation was successful.
- * @returns {string} return.status - The status of the user: "inactive", "low", "medium", or "high", or an error message if the process failed.
- * @throws {Error} If the user activity could not be aggregated or if there is an issue with the score calculation.
- 
+ * Determines the status of users based on their normalised scores.
+ *
+ * This function takes an array of normalised scores and compares each score with
+ * the provided thresholds in the `configTable`. It categorises users into
+ * different status groups: inactive, low, medium, and high activity based on
+ * the score ranges defined in the `configTable`.
+ *
+ * @param {number[]} normalisedScores - An array of normalised scores representing user activity levels.
+ * @param {Object} configTable - An object containing threshold values for determining user status.
+ * @param {number} configTable.low_threshold - The threshold below which users are considered inactive.
+ * @param {number} configTable.medium_threshold - The threshold for users to be categorised as low activity.
+ * @param {number} configTable.high_threshold - The threshold above which users are considered to have high activity.
+ *
+ * @returns {Object} An object representing the count of users in each activity status category:
+ *                   `inactive`, `low`, `medium`, and `high`.
+ *                   Example: `{ inactive: 5, low: 10, medium: 15, high: 20 }`.
+ *
+ * @throws {Error} Throws an error if there is an issue during the status determination process.
  */
-export const decideStatus = async (configTable, userId, userActivity) => {
+export const decideStatus = async (normalisedScores, configTable) => {
 	try {
-		const aggregatedActivity = aggregateUserActivity(userId, userActivity);
-
-		if (!aggregatedActivity.success) {
-			logger.error("activity has not been fetched correctly");
-			throw Error("activity has not been fetched correctly");
+		const finalStatus = { low: 0, medium: 0, high: 0, inactive: 0 };
+		for (const score of normalisedScores) {
+			if (score < configTable.low_threshold) {
+				finalStatus.inactive += 1;
+			} else if (score < configTable.medium_threshold) {
+				finalStatus.low += 1;
+			} else if (score < configTable.high_threshold) {
+				finalStatus.medium += 1;
+			} else {
+				finalStatus.high += 1;
+			}
 		}
 
-		const score = decideScore({
-			messages: aggregatedActivity.countActivity.messagesCount,
-			reactions: aggregatedActivity.countActivity.reactionsCount,
-			reactionsReceived:
-				aggregatedActivity.countActivity.reactionsReceivedCount,
-			messageWeight: configTable.message_weighting,
-			reactionWeight: configTable.reactions_weighting,
-			reactionsReceivedWeight: configTable.reactions_received_weighting,
-		});
-
-		if (score < configTable.low_threshold) {
-			return { success: true, status: "inactive" };
-		} else if (score < configTable.medium_threshold) {
-			return { success: true, status: "low" };
-		} else if (score < configTable.high_threshold) {
-			return { success: true, status: "medium" };
-		} else {
-			return { success: true, status: "high" };
-		}
+		return finalStatus;
 	} catch (error) {
 		logger.error(error);
 		throw error;
