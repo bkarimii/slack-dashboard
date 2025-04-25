@@ -215,6 +215,70 @@ api.post("/upload", processUpload, async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /users/status-counts:
+ *   get:
+ *     summary: Get user activity status counts
+ *     description: Retrieves user activity data within a specified date range, normalizes the scores, and calculates the status and box plot data.
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The start date for the activity data (YYYY-MM-DD).
+ *       - in: query
+ *         name: end_date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The end date for the activity data (YYYY-MM-DD).
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user activity status counts and box plot data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       user_id:
+ *                         type: string
+ *                         description: The ID of the user.
+ *                       status:
+ *                         type: string
+ *                         description: The calculated status of the user.
+ *                 boxPlotData:
+ *                   type: object
+ *                   description: Data for generating a box plot of normalized scores.
+ *       400:
+ *         description: Bad request. Missing or invalid query parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Missing or invalid query parameters.
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: server error.
+ */
 api.get("/users/status-counts", async (req, res) => {
 	const startDate = req.query.start_date;
 	const endDate = req.query.end_date;
