@@ -24,7 +24,9 @@ export const updateUsersActivity = async (processedActivity, db) => {
 	try {
 		if (!processedActivity || Object.keys(processedActivity).length === 0) {
 			logger.error("invalid or empty activity data");
-			return { success: false, message: "invalid or empty activity data" };
+
+			throw Error("invalid or empty activity data");
+			// return { success: false, message: "invalid or empty activity data" };
 		}
 
 		// retrieve all the users in database as they are real users
@@ -70,7 +72,7 @@ export const updateUsersActivity = async (processedActivity, db) => {
 		if (usersActivity.length === 0) {
 			await db.query("COMMIT");
 			logger.warn("no user activity was found to be instrted.");
-			return { success: true };
+			return true;
 		}
 
 		const insertQuery = `
@@ -94,10 +96,10 @@ export const updateUsersActivity = async (processedActivity, db) => {
 
 		await db.query("COMMIT");
 
-		return { success: true };
+		return true;
 	} catch (error) {
 		await db.query("ROLLBACK");
 		logger.debug("Error inserting user activity:", error);
-		return { success: false, message: error.message };
+		throw error;
 	}
 };

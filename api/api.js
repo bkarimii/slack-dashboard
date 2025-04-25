@@ -1,8 +1,11 @@
 import { Router } from "express";
 
 import db from "./db.js";
+import { decideStatus } from "./functions/decideStatus.js";
+import { getBoxPlotData } from "./functions/getBoxPlotData.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import { processImportFiles } from "./functions/processImportFiles.js";
+import { scoreNormaliser } from "./functions/scoreNormaliser.js";
 import { updateDbUsers } from "./functions/updateDbUsers.js";
 import { updateUsersActivity } from "./functions/updateUsersActivity.js";
 import messageRouter from "./messages/messageRouter.js";
@@ -194,22 +197,54 @@ api.post("/upload", processUpload, async (req, res) => {
 
 		const processedActivity = processImportFiles(extractedDir);
 
-		const isUsersInserted = await updateDbUsers(extractedDir, db);
-
-		if (!isUsersInserted.success) {
-			return res.status(500).json({});
-		}
+		await updateDbUsers(extractedDir, db);
 
 		const isActivityInserted = await updateUsersActivity(processedActivity, db);
 
-		if (!isActivityInserted.success) {
-			return res.status(500).json({});
+		if (isActivityInserted) {
+			logger.info(
+				"isActivityInserted in the upload endpoint? => inserted successfully",
+			);
+			return res.status(200).json({});
 		}
 
-		return res.status(200).json({});
+		return res.status(500).json({});
 	} catch (error) {
 		logger.error(error);
 		return res.status(500).json({});
+	}
+});
+
+api.get("/users/status-counts", async (req, res) => {
+	const startDate = req.query.start_date;
+	const endDate = req.query.end_date;
+	try {
+		const dbFetchedActivity = await db.query(
+			"select user_id , messages , reactions , reactions_received FROM slack_user_activity WHERE date BETWEEN $1 AND $2 ",
+			[startDate, endDate],
+		);
+		const userActivities = dbFetchedActivity.rows;
+
+		const rawUsers = await db.query("SELECT user_id FROM all_users");
+		const allusers = rawUsers.rows;
+
+		const rawConfigTable = await db.query("SELECT * FROM config_table");
+		const configTable = rawConfigTable.rows[0];
+
+		const normalisedScores = scoreNormaliser(
+			allusers,
+			userActivities,
+			configTable,
+		);
+
+		const boxPlotData = getBoxPlotData(normalisedScores);
+		const totalStatus = await decideStatus(normalisedScores, configTable);
+
+		return res
+			.status(200)
+			.json({ status: totalStatus, boxPlotData: boxPlotData });
+	} catch (error) {
+		res.status(500).json({ msg: "server error" });
 	}
 });
 
@@ -310,6 +345,28 @@ api.put("/config", async (req, res) => {
 		!Number.isFinite(reactionsWeighting) ||
 		!Number.isFinite(reactionsReceivedWeighting)
 	) {
+		logger.error("input values are inavalid");
+		return res.status(400).json({ message: "total weight must be 100" });
+	}
+
+	const totalWeights =
+		messagesWeighting + reactionsWeighting + reactionsReceivedWeighting;
+
+	if (totalWeights !== 100) {
+		res.status(400).json({});
+	}
+
+	if (lowTreshholds + mediumTreshholds + highTreshHolds !== 100) {
+		logger.error("Thresholds must add up to 100.");
+		return res.status(400).json({});
+	}
+
+	if (
+		!(lowTreshholds < mediumTreshholds && mediumTreshholds < highTreshHolds)
+	) {
+		logger.error(
+			"Thresholds must be in increasing order: low < medium < high.",
+		);
 		return res.status(400).json({});
 	}
 
