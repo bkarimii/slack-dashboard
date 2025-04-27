@@ -1,5 +1,8 @@
-import { Router } from "express";
+import dotenv from "dotenv";
+import express from "express";
+const { Router } = express;
 
+import authRouter from "./auth/authController.js";
 import db from "./db.js";
 import { lookupEmail } from "./functions/lookupEmail.js";
 import { processImportFiles } from "./functions/processImportFiles.js";
@@ -9,9 +12,12 @@ import messageRouter from "./messages/messageRouter.js";
 import { processUpload } from "./middlewares/processUpload.js";
 import { zipExtractor } from "./middlewares/zipExtractor.js";
 import logger from "./utils/logger.js";
+import { sudo } from "./utils/middleware.js";
 
+dotenv.config();
 const api = Router();
-
+api.use(sudo);
+api.use("/auth", authRouter);
 api.use("/message", messageRouter);
 
 api.post("/subscribe", async (req, res) => {

@@ -11,10 +11,10 @@ export default defineConfig({
 	},
 	plugins: [react()],
 	server: {
-		port: process.env.PORT,
+		port: process.env.PORT ?? "3000",
 		proxy: {
 			"/api": `http://localhost:${apiPort}`,
-			"/healthz": `http://localhost:${apiPort}`,
+			"/health": `http://localhost:${apiPort}`,
 		},
 	},
 	test: {

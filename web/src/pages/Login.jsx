@@ -1,10 +1,13 @@
 import { GithubFilled } from "@ant-design/icons";
 import { Flex, Typography } from "antd";
 
+import { usePrincipal } from "../authHooks.js";
 import { SubscriptionLogo } from "../components/SubscriptionLogo";
 import { ThemedButton } from "../components/ThemedButton";
 
 export default function Login() {
+	const principal = usePrincipal();
+
 	return (
 		<Flex
 			align="center"
@@ -24,20 +27,38 @@ export default function Login() {
 
 				<Flex vertical gap={24} align="center">
 					<Typography.Title level={2} style={{ textAlign: "center" }}>
-						Discover your CodeYourFutre Slack engagement.
+						Discover your CodeYourFuture Slack engagement.
 					</Typography.Title>
-					<Typography.Title
-						level={5}
-						type="secondary"
-						style={{ textAlign: "center" }}
-					>
-						Sign in with your GitHub account.
-					</Typography.Title>
-					<ThemedButton icon={<GithubFilled />}>
-						<Typography.Title level={5} style={{ color: "#fff" }}>
-							Login with GitHub
-						</Typography.Title>
-					</ThemedButton>
+					{principal ? (
+						<ThemedButton type="primary">
+							<Typography.Link
+								href="/dashboard"
+								level={5}
+								style={{ color: "#fff" }}
+							>
+								Dashboard
+							</Typography.Link>
+						</ThemedButton>
+					) : (
+						<>
+							<Typography.Title
+								level={5}
+								type="secondary"
+								style={{ textAlign: "center" }}
+							>
+								Sign in with your GitHub account.
+							</Typography.Title>
+							<ThemedButton type="primary" icon={<GithubFilled />}>
+								<Typography.Link
+									href="/api/auth/login"
+									level={5}
+									style={{ color: "#fff" }}
+								>
+									Login with GitHub
+								</Typography.Link>
+							</ThemedButton>
+						</>
+					)}
 				</Flex>
 			</Flex>
 		</Flex>

@@ -3,7 +3,9 @@ import { Route, Routes } from "react-router-dom";
 
 import "./App.css";
 import About from "./pages/About.jsx";
+import Authenticated from "./pages/Authenticated.jsx";
 import { ConfirmationPage } from "./pages/ConfirmationPage.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 import { ErrorOnSubscribe } from "./pages/ErrorOnSubscribe.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
@@ -21,7 +23,12 @@ function App() {
 				<Route path="/subscribe" element={<Subscribe />} />
 				<Route path="/subscribe/confirmation" element={<ConfirmationPage />} />
 				<Route path="/subscribe/error" element={<ErrorOnSubscribe />} />
-				<Route path="/upload" element={<FileUploading />} />
+				<Route path="/upload" element={<Authenticated />}>
+					<Route index element={<FileUploading />} />
+				</Route>
+				<Route path="/dashboard" element={<Authenticated />}>
+					<Route index element={<Dashboard />} />
+				</Route>
 			</Routes>
 		</ConfigProvider>
 	);
