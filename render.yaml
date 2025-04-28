@@ -7,7 +7,7 @@ services:
     env: node
     buildCommand: npm ci --include dev; npm run build; npm prune --omit dev
     startCommand: npm start
-    healthCheckPath: /healthz
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         fromDatabase:

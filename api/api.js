@@ -8,7 +8,7 @@ import { lookupEmail } from "./functions/lookupEmail.js";
 import { processImportFiles } from "./functions/processImportFiles.js";
 import { updateDbUsers } from "./functions/updateDbUsers.js";
 import { updateUsersActivity } from "./functions/updateUsersActivity.js";
-import messageRouter from "./messages/messageRouter.js";
+import messageRouter from "./message/messageRouter.js";
 import { processUpload } from "./middlewares/processUpload.js";
 import { zipExtractor } from "./middlewares/zipExtractor.js";
 import logger from "./utils/logger.js";

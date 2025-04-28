@@ -4,6 +4,6 @@ import app from "./app.js";
 
 describe("base API endpoints", () => {
 	it("exposes a health endpoint", async () => {
-		await request(app).get("/healthz").expect(200);
+		await request(app).get("/health").expect(200);
 	});
 });

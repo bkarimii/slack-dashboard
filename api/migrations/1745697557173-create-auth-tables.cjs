@@ -21,6 +21,7 @@ const migration = {
 	},
 
 	up(pgm) {
+		pgm.sql('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
 		pgm.createTable("sessions", {
 			expire: { type: "timestamp(6)", notNull: true },
 			sess: { type: "json", notNull: true },

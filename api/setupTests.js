@@ -2,6 +2,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
+import dotenv from "dotenv";
+dotenv.config();
 import { runner } from "node-pg-migrate";
 
 import { connectDb, disconnectDb } from "./db.js";
@@ -28,8 +30,9 @@ afterAll(async () => {
 async function applyMigrations(databaseUrl) {
 	await runner({
 		databaseUrl,
-		dir: join(__dirname, "migrations"),
+		dir: join(__dirname, "migrations/utils"),
 		direction: "up",
 		ignorePattern: "(config|template)\\.cjs$",
+		migrationFileExtension: ".cjs",
 	});
 }
