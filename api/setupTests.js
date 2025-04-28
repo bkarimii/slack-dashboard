@@ -30,7 +30,7 @@ afterAll(async () => {
 async function applyMigrations(databaseUrl) {
 	await runner({
 		databaseUrl,
-		dir: join(__dirname, "migrations/utils"),
+		dir: join(__dirname, "migrations"),
 		direction: "up",
 		ignorePattern: "(config|template)\\.cjs$",
 		migrationFileExtension: ".cjs",
