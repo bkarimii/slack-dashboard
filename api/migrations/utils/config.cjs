@@ -1,6 +1,6 @@
 const { join } = require("node:path");
 
-const config = require("../utils/config.cjs");
+const config = require("../../utils/config.cjs");
 
 const migrationConfig = {
 	"ignore-pattern": "(config|template)\\.cjs$",

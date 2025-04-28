@@ -1,10 +1,13 @@
+import { timingSafeEqual } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import express, { Router } from "express";
+import { validate, ValidationError } from "express-validation";
 import helmet from "helmet";
 import morgan from "morgan";
 
+import config from "./config.cjs";
 import logger from "./logger.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -18,6 +21,13 @@ export const asyncHandler = (handler) => {
 			next(err);
 		}
 	};
+};
+
+export const authOnly = (req, res, next) => {
+	if (req.user) {
+		return next();
+	}
+	res.sendStatus(401);
 };
 
 export const clientRouter = (apiRoot) => {
@@ -54,4 +64,37 @@ export const logErrors = () => (err, _, res, next) => {
 	}
 	logger.error("%O", err);
 	res.sendStatus(500);
+};
+
+export const methodNotAllowed = (_, res) => res.sendStatus(405);
+
+export const sudo = (req, res, next) => {
+	const sudoToken = Buffer.from(config.sudoToken);
+	const header = req.get("Authorization");
+	const headerToken = header?.startsWith("Bearer ") && header?.slice(7);
+	req.superuser = timingSafeEqual(
+		sudoToken,
+		Buffer.alloc(sudoToken.length, headerToken),
+	);
+	next();
+};
+
+export const sudoOnly = (req, res, next) => {
+	if (req.superuser || req.user?.is_admin) {
+		return next();
+	}
+	res.sendStatus(401);
+};
+
+export const validated = (rules) => (req, res, next) => {
+	validate(rules, { context: true, keyByField: true }, { abortEarly: false })(
+		req,
+		res,
+		(err) => {
+			if (err instanceof ValidationError) {
+				return res.status(400).json(Object.assign({}, ...err.details));
+			}
+			next(err);
+		},
+	);
 };
