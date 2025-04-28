@@ -17,6 +17,25 @@ const api = Router();
 
 api.use("/message", messageRouter);
 
+/**
+ * @swagger
+ * /subscribe:
+ *   post:
+ *     summary: Subscribe a user by email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: example@email.com
+ *     responses:
+ *       302:
+ *         description: Redirects on success or failure
+ */
 api.post("/subscribe", async (req, res) => {
 	const email = req.body.email;
 	try {
@@ -63,6 +82,51 @@ api.post("/subscribe", async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /fetch-users:
+ *   get:
+ *     summary: Retrieve all users from the database
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *       404:
+ *         description: No users found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
 api.get("/fetch-users", async (req, res) => {
 	try {
 		const result = await db.query("SELECT * FROM all_users");
@@ -77,6 +141,55 @@ api.get("/fetch-users", async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /upload:
+ *   post:
+ *     summary: Upload and process a Slack export file
+ *     description: Accepts a Slack export ZIP file, extracts its contents, processes the data, and updates the database with user and activity information.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: The Slack export ZIP file to upload and process.
+ *     responses:
+ *       200:
+ *         description: The file was successfully processed, and the database was updated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Bad request. The uploaded file is invalid or missing.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid file upload.
+ *       500:
+ *         description: Internal server error. An error occurred while processing the file or updating the database.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error.
+ */
 api.post("/upload", processUpload, async (req, res) => {
 	try {
 		const slackZipBuffer = req.file.buffer;
@@ -102,6 +215,70 @@ api.post("/upload", processUpload, async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /users/status-counts:
+ *   get:
+ *     summary: Get user activity status counts
+ *     description: Retrieves user activity data within a specified date range, normalizes the scores, and calculates the status and box plot data.
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The start date for the activity data (YYYY-MM-DD).
+ *       - in: query
+ *         name: end_date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The end date for the activity data (YYYY-MM-DD).
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user activity status counts and box plot data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       user_id:
+ *                         type: string
+ *                         description: The ID of the user.
+ *                       status:
+ *                         type: string
+ *                         description: The calculated status of the user.
+ *                 boxPlotData:
+ *                   type: object
+ *                   description: Data for generating a box plot of normalized scores.
+ *       400:
+ *         description: Bad request. Missing or invalid query parameters.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Missing or invalid query parameters.
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: server error.
+ */
 api.get("/users/status-counts", async (req, res) => {
 	const startDate = req.query.start_date;
 	const endDate = req.query.end_date;
@@ -135,6 +312,85 @@ api.get("/users/status-counts", async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /config:
+ *   put:
+ *     summary: Update configuration settings
+ *     description: Updates the thresholds and weightings for the application configuration.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               lowTreshholds:
+ *                 type: integer
+ *                 description: The low threshold value.
+ *                 example: 10
+ *               mediumTreshholds:
+ *                 type: integer
+ *                 description: The medium threshold value.
+ *                 example: 20
+ *               highTreshHolds:
+ *                 type: integer
+ *                 description: The high threshold value.
+ *                 example: 30
+ *               messagesWeighting:
+ *                 type: number
+ *                 description: The weighting for messages.
+ *                 example: 1.5
+ *               reactionsWeighting:
+ *                 type: number
+ *                 description: The weighting for reactions.
+ *                 example: 2.0
+ *               reactionsReceivedWeighting:
+ *                 type: number
+ *                 description: The weighting for reactions received.
+ *                 example: 2.5
+ *     responses:
+ *       200:
+ *         description: Configuration updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Bad request. Invalid or missing input data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid input data.
+ *       404:
+ *         description: Configuration not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Configuration not found.
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error.
+ */
 api.put("/config", async (req, res) => {
 	const {
 		lowTreshholds,
