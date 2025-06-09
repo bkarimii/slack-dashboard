@@ -2,6 +2,7 @@ import express from "express";
 
 import apiRouter from "./api.js";
 import db from "./db.js";
+import setupSwagger from "./swagger.js";
 import config from "./utils/config.cjs";
 import {
 	asyncHandler,
@@ -32,6 +33,8 @@ app.get(
 		res.sendStatus(200);
 	}),
 );
+
+setupSwagger(app);
 
 app.use(apiRoot, apiRouter);
 
