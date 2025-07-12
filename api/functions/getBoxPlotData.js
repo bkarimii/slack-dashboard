@@ -8,9 +8,10 @@
  * @param {number[]} scores - An array of numerical scores to analyse.
  * @returns {Object|null} An object containing min, Q1, median, Q3, max, and outliers, or null if the array is empty.
  */
-export const getBoxPlotData = (scores) => {
-	if (!scores.length) return null;
+export const getBoxPlotData = (userScores) => {
+	if (!userScores.length) return null;
 
+	const scores = userScores.map((user) => user.score);
 	const sorted = [...scores].sort((a, b) => a - b);
 	const n = sorted.length;
 
