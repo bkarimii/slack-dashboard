@@ -1,41 +1,46 @@
 import logger from "../utils/logger.js";
 
 /**
- * Determines the status of users based on their normalised scores.
+ * Determines the activity status of users based on their normalised scores.
  *
- * This function takes an array of normalised scores and compares each score with
- * the provided thresholds in the `configTable`. It categorises users into
- * different status groups: inactive, low, medium, and high activity based on
- * the score ranges defined in the `configTable`.
+ * This function takes an array of user objects (each containing `userId` and normalised `score`)
+ * and categorises them into activity levels based on threshold values provided in the `configTable`.
+ * The categories are: `inactive`, `low`, `medium`, and `high`.
  *
- * @param {number[]} normalisedScores - An array of normalised scores representing user activity levels.
- * @param {Object} configTable - An object containing threshold values for determining user status.
- * @param {number} configTable.low_threshold - The threshold below which users are considered inactive.
- * @param {number} configTable.medium_threshold - The threshold for users to be categorised as low activity.
- * @param {number} configTable.high_threshold - The threshold above which users are considered to have high activity.
+ * @param {Array<{userId: string|number, score: number}>} normalisedUser -
+ *        An array of user objects with userId and their normalised score (0–100).
+ * @param {Object} configTable - Configuration object containing threshold values for activity levels.
+ * @param {number} configTable.low_threshold - Scores below this are considered 'inactive'.
+ * @param {number} configTable.medium_threshold - Scores between `low` and this are 'low' activity.
+ * @param {number} configTable.high_threshold - Scores between `medium` and this are 'medium' activity;
+ *                                              scores above this are 'high' activity.
  *
  * @returns {Object} An object representing the count of users in each activity status category:
- *                   `inactive`, `low`, `medium`, and `high`.
- *                   Example: `{ inactive: 5, low: 10, medium: 15, high: 20 }`.
+ *                   `{ inactive: number, low: number, medium: number, high: number }`
  *
- * @throws {Error} Throws an error if there is an issue during the status determination process.
+ * @throws {Error} Throws an error if status determination fails.
  */
-export const decideStatus = async (normalisedScores, configTable) => {
+export const decideStatus = async (normalisedUser, configTable) => {
 	try {
+		const usersByStatus = { low: [], medium: [], high: [], inactive: [] };
 		const finalStatus = { low: 0, medium: 0, high: 0, inactive: 0 };
-		for (const score of normalisedScores) {
-			if (score < configTable.low_threshold) {
+		for (const user of normalisedUser) {
+			if (user.score < configTable.low_threshold) {
 				finalStatus.inactive += 1;
-			} else if (score < configTable.medium_threshold) {
+				usersByStatus.inactive.push(user);
+			} else if (user.score < configTable.medium_threshold) {
 				finalStatus.low += 1;
-			} else if (score < configTable.high_threshold) {
+				usersByStatus.low.push(user);
+			} else if (user.score < configTable.high_threshold) {
 				finalStatus.medium += 1;
+				usersByStatus.medium.push(user);
 			} else {
 				finalStatus.high += 1;
+				usersByStatus.high.push(user);
 			}
 		}
 
-		return finalStatus;
+		return { finalStatus, usersByStatus };
 	} catch (error) {
 		logger.error(error);
 		throw error;

@@ -24,21 +24,31 @@ const decideTotalScore = (userId, userActivity, configTable) => {
  * Normalises the activity scores of a list of users to a 0–100 scale,
  * where the highest score becomes 100 and others are scaled relative to it.
  *
+ * Each returned object links the normalised score to its corresponding user ID.
+ *
  * @param {Array<Object>} usersArray - Array of user objects, each containing at least a `user_id` property.
  * @param {Object} userActivity - An object containing raw activity data for users.
  * @param {Object} configTable - Configuration object that includes the weighting of each activity type.
- * @returns {Array<number>} - An array of normalised scores between 0 and 100.
+ * @returns {Array<{userId: string|number, score: number}>} - An array of objects with userId and their normalised score (0–100).
  */
 export const scoreNormaliser = (usersArray, userActivity, configTable) => {
-	const scoreArray = [];
-	for (const user of usersArray) {
-		scoreArray.push(decideTotalScore(user.user_id, userActivity, configTable));
-	}
+	const scoredUsers = usersArray.map((user) => {
+		const score = decideTotalScore(user.user_id, userActivity, configTable);
+		return {
+			userId: user.user_id,
+			name: user.name,
+			email: user.email,
+			score,
+		};
+	});
 
-	const maxScore = Math.max(...scoreArray);
-	const normalisedScores = scoreArray.map((score) =>
-		Math.round((score / maxScore) * 100),
-	);
+	const maxScore = Math.max(...scoredUsers.map((u) => u.score));
+	const normalisedScores = scoredUsers.map((user) => {
+		return {
+			...user,
+			score: Math.round((user.score / maxScore) * 100),
+		};
+	});
 
 	return normalisedScores;
 };
