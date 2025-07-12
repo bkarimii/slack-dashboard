@@ -32,18 +32,20 @@ const decideTotalScore = (userId, userActivity, configTable) => {
  * @returns {Array<{userId: string|number, score: number}>} - An array of objects with userId and their normalised score (0–100).
  */
 export const scoreNormaliser = (usersArray, userActivity, configTable) => {
-	const scoreArray = [];
-	for (const user of usersArray) {
-		scoreArray.push({
-			userId: user.user_id,
-			score: decideTotalScore(user.user_id, userActivity, configTable),
-		});
-	}
-
-	const maxScore = Math.max(...scoreArray.map((u) => u.score));
-	const normalisedScores = scoreArray.map((user) => {
+	const scoredUsers = usersArray.map((user) => {
+		const score = decideTotalScore(user.user_id, userActivity, configTable);
 		return {
-			userId: user.userId,
+			userId: user.user_id,
+			name: user.name,
+			email: user.email,
+			score,
+		};
+	});
+
+	const maxScore = Math.max(...scoredUsers.map((u) => u.score));
+	const normalisedScores = scoredUsers.map((user) => {
+		return {
+			...user,
 			score: Math.round((user.score / maxScore) * 100),
 		};
 	});
