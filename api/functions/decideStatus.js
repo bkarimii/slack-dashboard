@@ -22,20 +22,25 @@ import logger from "../utils/logger.js";
  */
 export const decideStatus = async (normalisedUser, configTable) => {
 	try {
+		const usersByStatus = { low: [], medium: [], high: [], inactive: [] };
 		const finalStatus = { low: 0, medium: 0, high: 0, inactive: 0 };
 		for (const user of normalisedUser) {
 			if (user.score < configTable.low_threshold) {
 				finalStatus.inactive += 1;
+				usersByStatus.inactive.push(user);
 			} else if (user.score < configTable.medium_threshold) {
 				finalStatus.low += 1;
+				usersByStatus.low.push(user);
 			} else if (user.score < configTable.high_threshold) {
 				finalStatus.medium += 1;
+				usersByStatus.medium.push(user);
 			} else {
 				finalStatus.high += 1;
+				usersByStatus.high.push(user);
 			}
 		}
 
-		return finalStatus;
+		return { finalStatus, usersByStatus };
 	} catch (error) {
 		logger.error(error);
 		throw error;
