@@ -289,7 +289,9 @@ api.get("/users/status-counts", async (req, res) => {
 		);
 		const userActivities = dbFetchedActivity.rows;
 
-		const rawUsers = await db.query("SELECT user_id FROM all_users");
+		const rawUsers = await db.query(
+			"SELECT user_id,display_name_normalised,email FROM all_users",
+		);
 		const allusers = rawUsers.rows;
 
 		const rawConfigTable = await db.query("SELECT * FROM config_table");
